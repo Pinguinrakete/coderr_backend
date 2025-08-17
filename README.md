@@ -1,5 +1,15 @@
-# KanMind Backend
- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 
+# Coderr – Backend Description
+This is the backend of Coderr, a platform for freelance services. The application distinguishes between two user roles: clients and providers.
+
+Core features include:
+
+    • Registration, login, and an optional guest access  
+    • Profile management for both user roles  
+    • Providers can create, edit, and manage their service offerings  
+    • Clients can place and manage orders, as well as rate providers  
+
+The API serves as the foundation for seamless communication between the frontend and the database, ensuring a clear separation of user permissions and functionalities.
+
 ## ![Features Icon](assets/icons/gear.png) Features
     • User registration and login
 ## ![Tech Stack Icon](assets/icons/stack.png) Tech Stack
@@ -14,13 +24,13 @@ git clone https://github.com/Pinguinrakete/coderr_backend.git
 cd coderr_backend
 ```
 ## 2. Create virtual environment
-# Windows
+### Windows
 python -m venv env
 ```bash
 source ".\env\Scripts\activate"
 ```  
 
-# macOS/Linux
+### macOS/Linux
 python3 -m venv env
 ```bash
 source ".\env\bin\activate"
@@ -64,12 +74,13 @@ Only authenticated users with a valid token are granted access to the protected 
     • GET     /api/orders/  ➤ Returns a list of orders created by the logged-in user as a 
                                customer or business partner.
     • POST    /api/orders/  ➤ Creates a new order based on offer details (OfferDetail).
-    • PATCH   /api/orders/<id>/  ➤ Updates the status of a specific order (e.g., 'in_progress', 'completed', 'cancelled').
+    • PATCH   /api/orders/<id>/  ➤ Updates the status of a specific order 
+                                    (e.g., 'in_progress', 'completed', 'cancelled').
     • DELETE  /api/orders/<id>/  ➤ Deletes a specific order; restricted to admin (staff) users.
     • GET     /api/order-count/<business_user_id>/  ➤ Returns the count of ongoing ('in_progress') 
                                                        orders for a specific business user.
-    • GET     /api/completeted-order-count/<business_user_id> ➤ Returns the count of completed ('completed') 
-                                                                 orders for a specific business user.
+    • GET     /api/completeted-order-count/<business_user_id> ➤ Returns the count of completed 
+                                                ('completed') orders for a specific business user.
 
 ## ![Rewiews Icon](assets/icons/reviews.png) Rewiews
     • GET     /api/reviews/  ➤ Lists all available reviews.
@@ -78,8 +89,8 @@ Only authenticated users with a valid token are granted access to the protected 
     • DELETE  /api/reviews/<id>/  ➤ Deletes a specific review.
 
 ## ![Endpoint Icon](assets/icons/endpoint.png) Cross-cutting endpoints
-    • GET     /api/base-info/     ➤ Retrieves general platform information, including number of reviews, 
-                                     average rating, number of business users, and number of offers.
+    • GET     /api/base-info/  ➤ Retrieves general platform information, including number of reviews, 
+                                  average rating, number of business users, and number of offers.
 
 ## ![License Icon](assets/icons/certificate.png) License
 This project is intended exclusively for students of the Developer Akademie and is not licensed for public use or distribution. 
