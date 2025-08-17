@@ -1,7 +1,7 @@
 # Coderr – Backend Description
 This is the backend of Coderr, a platform for freelance services. The application distinguishes between two user roles: clients and providers.
 
-Core features include:
+## ![Features Icon](assets/icons/gear.png) Features
 
     • Registration, login, and an optional guest access  
     • Profile management for both user roles  
@@ -10,8 +10,6 @@ Core features include:
 
 The API serves as the foundation for seamless communication between the frontend and the database, ensuring a clear separation of user permissions and functionalities.
 
-## ![Features Icon](assets/icons/gear.png) Features
-    • User registration and login
 ## ![Tech Stack Icon](assets/icons/stack.png) Tech Stack
     • Python 3.x
     • Django 4.x
