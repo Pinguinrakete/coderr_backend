@@ -21,15 +21,15 @@ git clone https://github.com/Pinguinrakete/coderr_backend.git
 ```bash
 cd coderr_backend
 ```
-## 2. Create virtual environment
-### Windows
+## 2. Create a virtual environment to isolate our package dependencies locally
 python -m venv env
+
+### Windows
 ```bash
 source ".\env\Scripts\activate"
 ```  
 
 ### macOS/Linux
-python3 -m venv env
 ```bash
 source ".\env\bin\activate"
 ```  
