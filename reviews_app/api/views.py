@@ -1,3 +1,9 @@
-from django.shortcuts import render
+from rest_framework.views import APIView
 
-# Create your views here.
+class ReviewsView(APIView):
+    pass
+
+
+class ReviewSingleView(APIView):
+    pass
+
