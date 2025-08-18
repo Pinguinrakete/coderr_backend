@@ -1,3 +1,12 @@
-from django.shortcuts import render
+from rest_framework.views import APIView
 
-# Create your views here.
+class OffersView(APIView):
+    pass
+
+
+class OfferSingleView(APIView):
+    pass
+
+
+class OfferDetailsView(APIView):
+    pass
