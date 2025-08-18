@@ -44,7 +44,7 @@ INSTALLED_APPS = [
     'offers_app',
     'orders_app',
     'reviews_app',
-    # 'cross_cutting_endpoints_app',
+    'cross_cutting_endpoints_app',
     'corsheaders',
 ]
 
