@@ -1,22 +1,8 @@
-# from django.urls import path
-# from .views import RegistrationView, LoginView
+from django.urls import path
+from .views import ProfileSingleView, ProfilesBusinessView, ProfilesCustomerView
 
-# """
-# URL patterns for user authentication.
-
-# Endpoints:
-
-# - POST /registration/  
-#   Registers a new user.  
-#   Accepts: full name, email, password, repeated password.  
-#   Returns: user data on success or validation errors.
-
-# - POST /login/  
-#   Logs in a user.  
-#   Accepts: email and password.  
-#   Returns: user data on success or authentication error.
-# """
-# urlpatterns = [
-#     path('registration/', RegistrationView.as_view(), name='registration'),
-#     path('login/', LoginView.as_view(), name='login')
-# ]
+urlpatterns = [
+    path('profile/<int:pk>/', ProfileSingleView.as_view(), name='profile-detail'),
+    path('profiles/business/', ProfilesBusinessView.as_view()),
+    path('profiles/customer/', ProfilesCustomerView.as_view())
+]

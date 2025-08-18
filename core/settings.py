@@ -40,7 +40,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     'auth_app',
-    #'profile_app'
+    'profile_app',
     'corsheaders',
 ]
 
@@ -76,7 +76,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'core.wsgi.application'
 
-# own user model with type customer vs business
+# User model with user types: customer and business
 AUTH_USER_MODEL = 'auth_app.Account'
 
 # Database

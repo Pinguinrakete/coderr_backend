@@ -1,3 +1,12 @@
-from django.shortcuts import render
+from rest_framework.views import APIView
 
-# Create your views here.
+class ProfileSingleView(APIView):
+    pass
+
+
+class ProfilesBusinessView(APIView):
+    pass
+
+
+class ProfilesCustomerView(APIView):
+    pass
