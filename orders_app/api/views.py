@@ -1,3 +1,16 @@
-from django.shortcuts import render
+from rest_framework.views import APIView
 
-# Create your views here.
+class OrdersView(APIView):
+    pass
+
+
+class OrderSingleView(APIView):
+    pass
+
+
+class OrderCountView(APIView):
+    pass
+
+
+class CompletedOrderCountView(APIView):
+    pass
