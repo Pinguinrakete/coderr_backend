@@ -9,6 +9,9 @@ core/__pycache__/
 auth_app/__pycache__/
 auth_app/api/__pycache__/
 auth_app/migrations/__pycache__/
+profile_app/__pycache__/
+profile_app/api/__pycache__/
+profile_app/migrations/__pycache__/
 
 # Python virtual environments
 env/
