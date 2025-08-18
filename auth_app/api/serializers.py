@@ -1,5 +1,7 @@
 from auth_app.models import Account
 from rest_framework import serializers
+from django.contrib.auth import authenticate
+from django.utils.translation import gettext_lazy as _
 
 """
 This handles user registration serializers.
@@ -33,3 +35,29 @@ class RegistrationSerializer(serializers.ModelSerializer):
         user = Account.objects.create_user(**validated_data)
 
         return user
+    
+""" 
+This serializer handles the user login process. 
+
+- Expects: username and password.
+- Authenticates user credentials.
+- Raises error if authentication fails.
+"""
+class LoginSerializer(serializers.Serializer):
+    username = serializers.CharField(write_only=True)
+    password = serializers.CharField(write_only=True)
+
+    class Meta:
+        model = Account
+        fields = ['username', 'password']
+
+    def validate(self, data):
+        username = data.get('username')
+        password = data.get('password')
+
+        user = authenticate(username=username, password=password)  
+        if user is None:
+            raise serializers.ValidationError(_("Username or password is invalid"))
+
+        data['user'] = user
+        return data
