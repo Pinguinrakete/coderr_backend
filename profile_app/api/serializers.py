@@ -1,12 +1,25 @@
 from rest_framework import serializers
-from offers_app.models import FileUpload
+from auth_app.models import Account
+from profile_app.models import Profiles, FileUpload
 
-class ProfileSerializer(serializers.ModelSerializer):
-    pass
+class ProfileSingleSerializer(serializers.ModelSerializer):
+    user = serializers.IntegerField(source='user.id')
+    username = serializers.CharField(source='user.username')
+    first_name = serializers.CharField(source='user.first_name')
+    last_name = serializers.CharField(source='user.last_name')
+    email = serializers.EmailField(source='user.email')
+
+    class Meta:
+        model = Profiles
+        fields = ['user', 'username', 'first_name', 'last_name', 'description', 'email']
+        # fields = ['user', 'username', 'first_name', 'last_name', 'file', 'location', 'tel', 'description', 'working_hours', 'type', 'email', 'created_at']
+        # read_only_fields = ['user', 'username', 'first_name', 'last_name', 'file', 'location', 'tel', 'description', 'working_hours', 'type', 'email', 'created_at']
 
 
 class ProfileSinglePatchSerializer(serializers.ModelSerializer):
-    pass
+    class Meta:
+        model = Profiles
+        fields = ['user', 'username', 'first_name', 'last_name', 'description', 'email']
 
 
 class ProfilesBusinessSerializer(serializers.ModelSerializer):
