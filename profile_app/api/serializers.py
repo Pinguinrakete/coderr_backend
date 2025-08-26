@@ -8,12 +8,12 @@ class ProfileSingleSerializer(serializers.ModelSerializer):
     first_name = serializers.CharField(source='user.first_name')
     last_name = serializers.CharField(source='user.last_name')
     email = serializers.EmailField(source='user.email')
+    created_at = serializers.DateTimeField(source='user.date_joined')
 
     class Meta:
         model = Profiles
-        fields = ['user', 'username', 'first_name', 'last_name', 'description', 'email']
-        # fields = ['user', 'username', 'first_name', 'last_name', 'file', 'location', 'tel', 'description', 'working_hours', 'type', 'email', 'created_at']
-        # read_only_fields = ['user', 'username', 'first_name', 'last_name', 'file', 'location', 'tel', 'description', 'working_hours', 'type', 'email', 'created_at']
+        fields = ['user', 'username', 'first_name', 'last_name', 'location', 'tel', 'description', 'working_hours', 'type', 'email', 'created_at']
+        read_only_fields = ['user', 'username', 'first_name', 'last_name', 'location', 'tel', 'description', 'working_hours', 'type', 'email', 'created_at']
 
 
 class ProfileSinglePatchSerializer(serializers.ModelSerializer):
