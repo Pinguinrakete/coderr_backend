@@ -8,7 +8,7 @@ class Profiles(models.Model):
     location = models.CharField(max_length=255, default="")
     tel = models.CharField(max_length=20, default="")
     working_hours = models.CharField(max_length=128, default="")
-    type = models.CharField(max_length=255, blank=True)
+    # type = models.CharField(max_length=255, blank=True)
 
     def __str__(self):
         return self.description or f'Profile of {self.user.username}'
