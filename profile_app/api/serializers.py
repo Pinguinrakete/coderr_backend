@@ -66,4 +66,19 @@ class ProfilesBusinessSerializer(serializers.ModelSerializer):
 
 
 class ProfilesCustomerSerializer(serializers.ModelSerializer):
-    pass
+    user = serializers.IntegerField(source='user.id')
+    username = serializers.CharField(source='user.username')
+    first_name = serializers.CharField(source='user.first_name')
+    last_name = serializers.CharField(source='user.last_name')    
+    file = serializers.SerializerMethodField()
+    type = serializers.CharField(source='user.user_type')
+
+    class Meta:
+        model = Profile
+        fields = ['user', 'username', 'first_name', 'last_name', 'file', 'type']
+        read_only_fields = fields
+
+    def get_file(self, obj):
+        if obj.file:
+            return obj.file.url
+        return None
