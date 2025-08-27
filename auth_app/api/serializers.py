@@ -2,7 +2,7 @@ from auth_app.models import Account
 from rest_framework import serializers
 from django.contrib.auth import authenticate
 from django.utils.translation import gettext_lazy as _
-from profile_app.models import Profiles
+from profile_app.models import Profile
 
 """
 This handles user registration serializers.
@@ -34,7 +34,7 @@ class RegistrationSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         validated_data.pop('repeated_password')
         user = Account.objects.create_user(**validated_data)
-        Profiles.objects.create(user=user)
+        Profile.objects.create(user=user)
 
         return user
     
