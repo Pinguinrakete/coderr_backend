@@ -20,14 +20,13 @@ class ProfileSingleView(APIView):
     def patch(self, request, pk):
         try:
             profile = Profile.objects.get(user__pk=pk)
-            print('profile: ', profile)
         except Profile.DoesNotExist:
             return Response({"detail": "Profile not found."}, status=status.HTTP_404_NOT_FOUND)
 
         serializer = ProfileSinglePatchSerializer(profile, data=request.data, partial=True, context={'request': request})
         if serializer.is_valid():
             profile = serializer.save()
-            return Response(ProfileSinglePatchSerializer(profile, context={'request': request}).data)
+            return Response(ProfileSingleSerializer(profile, context={'request': request}).data)
         
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
