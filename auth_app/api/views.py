@@ -1,3 +1,4 @@
+from django.utils import timezone
 from rest_framework.authtoken.models import Token
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
@@ -44,6 +45,9 @@ class LoginView(APIView):
         serializer = LoginSerializer(data=request.data)
         if serializer.is_valid():
             login_user = serializer.validated_data['user']
+            login_user.last_login = timezone.now()
+            login_user.save(update_fields=['last_login'])
+
             token, created = Token.objects.get_or_create(user=login_user)
             data = {
                 'token': token.key,
