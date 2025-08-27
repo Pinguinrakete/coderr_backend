@@ -4,6 +4,9 @@
 # Database
 db.sqlite3
 
+# uploads
+media/uploads/
+
 # __pycache__
 core/__pycache__/
 auth_app/__pycache__/
@@ -11,6 +14,7 @@ auth_app/api/__pycache__/
 auth_app/migrations/__pycache__/
 profile_app/__pycache__/
 profile_app/api/__pycache__/
+profile_app/migrations/
 profile_app/migrations/__pycache__/
 offers_app/__pycache__/
 offers_app/api/__pycache__/

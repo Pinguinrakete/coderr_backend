@@ -24,7 +24,11 @@ class ProfileSingleSerializer(serializers.ModelSerializer):
 
 class ProfileSinglePatchSerializer(serializers.ModelSerializer):
     first_name = serializers.CharField(source='user.first_name', required=False)
-    last_name = serializers.CharField(source='user.last_name', required=False)    
+    last_name = serializers.CharField(source='user.last_name', required=False) 
+
+    file = serializers.SerializerMethodField(source='file.file')
+    uploaded_at = serializers.DateTimeField(source='file.uploaded_at') 
+   
     email = serializers.EmailField(source='user.email', required=False)
 
     class Meta:
@@ -82,3 +86,8 @@ class ProfilesCustomerSerializer(serializers.ModelSerializer):
         if obj.file:
             return obj.file.url
         return None
+
+class FileUploadSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Profile
+        fields = ['file', 'uploaded_at']
