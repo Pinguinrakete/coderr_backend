@@ -57,7 +57,7 @@ class ProfilesBusinessSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Profile
-        fields = ['user', 'username', 'first_name', 'last_name', 'file','location', 'tel', 'description', 'working_hours', 'type']
+        fields = ['user', 'username', 'first_name', 'last_name', 'file', 'location', 'tel', 'description', 'working_hours', 'type']
         read_only_fields = fields
 
     def get_file(self, obj):
@@ -76,7 +76,7 @@ class ProfilesCustomerSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Profile
-        fields = ['user', 'username', 'first_name', 'last_name', 'file', 'type']
+        fields = ['user', 'username', 'first_name', 'last_name', 'file', 'uploaded_at', 'type']
         read_only_fields = fields
 
     def get_file(self, obj):
