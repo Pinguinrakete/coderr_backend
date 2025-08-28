@@ -2,7 +2,7 @@ from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 from rest_framework import status
-from .serializers import ProfileSingleSerializer, ProfileSinglePatchSerializer, FileUploadSerializer, ProfilesBusinessSerializer
+from .serializers import ProfileSingleSerializer, ProfileSinglePatchSerializer, ProfilesBusinessSerializer, ProfilesCustomerSerializer, FileUploadSerializer
 from profile_app.models import Profile
 
 class ProfileSingleView(APIView):
@@ -45,7 +45,16 @@ class ProfilesBusinessView(APIView):
 
 
 class ProfilesCustomerView(APIView):
-    pass
+    permission_classes = [AllowAny]
+
+    def get(self, request):
+        try:
+            profiles = Profile.objects.filter(user__user_type="customer")
+        except Profile.DoesNotExist:
+            return Response({"detail": "Profile not found."}, status=status.HTTP_404_NOT_FOUND)
+
+        serializer = ProfilesCustomerSerializer(profiles, many=True, context={'request': request})
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class FileUploadView(APIView):
