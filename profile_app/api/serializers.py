@@ -24,12 +24,9 @@ class ProfileSingleSerializer(serializers.ModelSerializer):
 
 class ProfileSinglePatchSerializer(serializers.ModelSerializer):
     first_name = serializers.CharField(source='user.first_name', required=False)
-    last_name = serializers.CharField(source='user.last_name', required=False) 
-
-    file = serializers.SerializerMethodField(source='file.file')
-    uploaded_at = serializers.DateTimeField(source='file.uploaded_at') 
-   
+    last_name = serializers.CharField(source='user.last_name', required=False)  
     email = serializers.EmailField(source='user.email', required=False)
+    file = serializers.FileField(required=False)
 
     class Meta:
         model = Profile

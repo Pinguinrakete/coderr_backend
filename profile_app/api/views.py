@@ -42,13 +42,7 @@ class ProfilesCustomerView(APIView):
 class FileUploadView(APIView):
     permission_classes = [AllowAny]
 
-    def post(self, request, format=None):
-        profile_id = request.data.get('id')
-
     def patch(self, request, format=None):
-        return self.handle_upload(request)
-
-    def handle_upload(self, request):
         profile_id = request.data.get('id')
         if not profile_id:
             return Response({"detail": "Profil-ID not found."}, status=status.HTTP_400_BAD_REQUEST)
@@ -62,4 +56,5 @@ class FileUploadView(APIView):
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
+        
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
