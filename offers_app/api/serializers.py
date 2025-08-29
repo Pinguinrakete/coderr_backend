@@ -1,6 +1,7 @@
 from rest_framework import serializers
+from offers_app.models import Offer
 
-class OffersSerializer(serializers.ModelSerializer):
+class OfferSerializer(serializers.ModelSerializer):
     pass
 
 
