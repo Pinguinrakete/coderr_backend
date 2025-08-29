@@ -1,1 +1,27 @@
 from django.db import models
+from auth_app.models import Account
+
+class Offer(models.Model):
+    user = models.OneToOneField(Account, on_delete=models.CASCADE, primary_key=True, related_name='offer')
+    title = models.CharField(max_length=255)
+    image = models.ImageField(upload_to='media/uploads/offers/', blank=True, null=True)
+    description = models.TextField(blank=True, default="")
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+
+class OfferDetails(models.Model):
+    class OfferType(models.TextChoices):
+        BASIC = 'basic', 'Basic'
+        STANDARD = 'standard', 'Standard'
+        PREMIUM = 'premium', 'Premium'
+
+    title = models.CharField(max_length=255)
+    revisions = models.PositiveIntegerField(default=0)
+    delivery_time_in_days = models.PositiveIntegerField()
+    price = models.DecimalField(max_digits=10, decimal_places=2, blank=False, null=True)
+    features = models.JSONField(default=list, blank=True)
+    offer_type = models.CharField(max_length=10, choices=OfferType.choices, default=OfferType.STANDARD)
+
+    def __str__(self):
+        return self.title
