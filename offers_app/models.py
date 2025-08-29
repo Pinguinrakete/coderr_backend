@@ -7,7 +7,6 @@ class OfferDetails(models.Model):
         STANDARD = 'standard', 'Standard'
         PREMIUM = 'premium', 'Premium'
 
-    offer = models.ForeignKey('Offer', on_delete=models.CASCADE, related_name='details')
     title = models.CharField(max_length=255)
     revisions = models.PositiveIntegerField(default=0)
     delivery_time_in_days = models.PositiveIntegerField()
@@ -20,9 +19,10 @@ class OfferDetails(models.Model):
     
 
 class Offer(models.Model):
-    user = models.OneToOneField(Account, on_delete=models.CASCADE, primary_key=True, related_name='offer')
+    user = models.ForeignKey(Account, on_delete=models.CASCADE, related_name='offers')
     title = models.CharField(max_length=255)
     image = models.ImageField(upload_to='media/uploads/offers/', blank=True, null=True)
     description = models.TextField(blank=True, default="")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    details = models.ManyToManyField(OfferDetails, blank=True)

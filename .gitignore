@@ -18,6 +18,7 @@ profile_app/migrations/
 profile_app/migrations/__pycache__/
 offers_app/__pycache__/
 offers_app/api/__pycache__/
+offers_app/migrations
 offers_app/migrations/__pycache__/
 orders_app/__pycache__/
 orders_app/api/__pycache__/
