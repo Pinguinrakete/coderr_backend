@@ -23,7 +23,7 @@ class OffersView(APIView):
 
 
 class OfferSingleView(APIView):
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
 
     def patch(self, request, id):
         try:
@@ -39,6 +39,18 @@ class OfferSingleView(APIView):
         
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+    def delete(self, request, id):
+        try:
+            offer = Offer.objects.get(pk=id)
+        except Offer.DoesNotExist:
+            return Response({"detail": "Offer not found."}, status=status.HTTP_404_NOT_FOUND)
+
+        if request.user.id != offer.user_id:
+            return Response({"detail": "Only the owner can delete this Offer."}, status=status.HTTP_403_FORBIDDEN)
+
+        offer.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+    
 
 class OfferDetailsView(APIView):
     permission_classes = [AllowAny]
@@ -51,6 +63,7 @@ class OfferDetailsView(APIView):
         
         serializer = OfferDetailsSerializer(offer_detail, context={'request': request})
         return Response(serializer.data, status=status.HTTP_200_OK)
+
 
 class ImageUploadView(APIView):
     permission_classes = [AllowAny]
