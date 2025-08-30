@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from offers_app.models import Offer, OfferDetails
+from offers_app.models import Offer, OfferDetail
 from auth_app.models import Account
 
 
@@ -7,8 +7,15 @@ class OfferDetailsSerializer(serializers.ModelSerializer):
     features = serializers.ListField(child=serializers.CharField(max_length=255), required=False, default=list)
 
     class Meta:
-        model = OfferDetails
+        model = OfferDetail
         fields = ['title', 'revisions', 'delivery_time_in_days', 'price', 'features', 'offer_type']
+
+class OfferDetailsWithIdSerializer(serializers.ModelSerializer):
+    features = serializers.ListField(child=serializers.CharField(max_length=255), required=False, default=list)
+
+    class Meta:
+        model = OfferDetail
+        fields = ['id', 'title', 'revisions', 'delivery_time_in_days', 'price', 'features', 'offer_type']
 
 
 class OfferSerializer(serializers.ModelSerializer):
@@ -26,7 +33,7 @@ class OfferSerializer(serializers.ModelSerializer):
         offer = Offer.objects.create(user=user, **validated_data)
         
         for detail_data in details_data:
-            detail_obj, created = OfferDetails.objects.get_or_create(**detail_data)
+            detail_obj, created = OfferDetail.objects.get_or_create(**detail_data)
             offer.details.add(detail_obj)
 
         return offer
@@ -35,10 +42,6 @@ class OfferSingleSerializer(serializers.ModelSerializer):
     pass
 
 class OfferSinglePatchSerializer(serializers.ModelSerializer):
-    pass
-
-
-class OfferDetailsSerializer(serializers.ModelSerializer):
     pass
 
 class ImageUploadSerializer(serializers.ModelSerializer):

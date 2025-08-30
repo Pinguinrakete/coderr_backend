@@ -2,8 +2,8 @@ from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework import status
 from rest_framework.response import Response
-from .serializers import OfferSerializer, ImageUploadSerializer
-from offers_app.models import Offer
+from .serializers import OfferSerializer, OfferDetailsWithIdSerializer, ImageUploadSerializer
+from offers_app.models import Offer, OfferDetail
 
 class OffersView(APIView):
     permission_classes = [IsAuthenticated]
@@ -27,7 +27,16 @@ class OfferSingleView(APIView):
 
 
 class OfferDetailsView(APIView):
-    pass
+    permission_classes = [AllowAny]
+    
+    def get(self, request, id):
+        try:
+            offer_detail = OfferDetail.objects.get(pk=id)
+        except OfferDetail.DoesNotExist:
+            return Response({"detail": "OfferDetail not found."}, status=status.HTTP_404_NOT_FOUND)
+        
+        serializer = OfferDetailsWithIdSerializer(offer_detail, context={'request': request})
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 class ImageUploadView(APIView):
     permission_classes = [AllowAny]
@@ -35,12 +44,12 @@ class ImageUploadView(APIView):
     def patch(self, request, format=None):
         offer_id = request.data.get('id')
         if not offer_id:
-            return Response({"detail": "Offer ID not found."}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"detail": "Image ID not found."}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
             offer = Offer.objects.get(pk=offer_id)
         except Offer.DoesNotExist:
-            return Response({"detail": "Offer not found."}, status=status.HTTP_404_NOT_FOUND)
+            return Response({"detail": "Image not found."}, status=status.HTTP_404_NOT_FOUND)
 
         serializer = ImageUploadSerializer(offer, data=request.data, partial=True)
         if serializer.is_valid():

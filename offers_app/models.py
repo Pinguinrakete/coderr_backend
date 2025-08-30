@@ -1,7 +1,7 @@
 from django.db import models
 from auth_app.models import Account
 
-class OfferDetails(models.Model):
+class OfferDetail(models.Model):
     class OfferType(models.TextChoices):
         BASIC = 'basic', 'Basic'
         STANDARD = 'standard', 'Standard'
@@ -25,4 +25,4 @@ class Offer(models.Model):
     description = models.TextField(blank=True, default="")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    details = models.ManyToManyField(OfferDetails, blank=True)
+    details = models.ManyToManyField(OfferDetail, blank=True)
