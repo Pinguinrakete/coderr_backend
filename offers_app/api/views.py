@@ -2,7 +2,7 @@ from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework import status
 from rest_framework.response import Response
-from .serializers import OfferSerializer, OfferDetailsSerializer, ImageUploadSerializer
+from .serializers import OfferSerializer, OfferDetailsSerializer, OfferSinglePatchSerializer, ImageUploadSerializer
 from offers_app.models import Offer, OfferDetail
 
 class OffersView(APIView):
@@ -23,7 +23,21 @@ class OffersView(APIView):
 
 
 class OfferSingleView(APIView):
-    pass
+    permission_classes = [AllowAny]
+
+    def patch(self, request, id):
+        try:
+            offer = Offer.objects.get(pk=id)
+        except Offer.DoesNotExist:
+            return Response({"detail": "Offer not found."}, status=status.HTTP_404_NOT_FOUND)
+
+        serializer = OfferSinglePatchSerializer(offer, data=request.data, partial=True, context={'request': request})
+        
+        if serializer.is_valid():
+            offer = serializer.save()
+            return Response(OfferSinglePatchSerializer(offer, context={'request': request}).data)
+        
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class OfferDetailsView(APIView):
