@@ -2,7 +2,7 @@ from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework import status
 from rest_framework.response import Response
-from .serializers import OfferSerializer, OfferDetailsWithIdSerializer, ImageUploadSerializer
+from .serializers import OfferSerializer, OfferDetailsSerializer, ImageUploadSerializer
 from offers_app.models import Offer, OfferDetail
 
 class OffersView(APIView):
@@ -35,7 +35,7 @@ class OfferDetailsView(APIView):
         except OfferDetail.DoesNotExist:
             return Response({"detail": "OfferDetail not found."}, status=status.HTTP_404_NOT_FOUND)
         
-        serializer = OfferDetailsWithIdSerializer(offer_detail, context={'request': request})
+        serializer = OfferDetailsSerializer(offer_detail, context={'request': request})
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 class ImageUploadView(APIView):

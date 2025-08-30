@@ -8,14 +8,14 @@ class OfferDetailsSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = OfferDetail
-        fields = ['title', 'revisions', 'delivery_time_in_days', 'price', 'features', 'offer_type']
-
-class OfferDetailsWithIdSerializer(serializers.ModelSerializer):
-    features = serializers.ListField(child=serializers.CharField(max_length=255), required=False, default=list)
-
-    class Meta:
-        model = OfferDetail
         fields = ['id', 'title', 'revisions', 'delivery_time_in_days', 'price', 'features', 'offer_type']
+
+# class OfferDetailsWithIdSerializer(serializers.ModelSerializer):
+#     features = serializers.ListField(child=serializers.CharField(max_length=255), required=False, default=list)
+
+#     class Meta:
+#         model = OfferDetail
+#         fields = ['id', 'title', 'revisions', 'delivery_time_in_days', 'price', 'features', 'offer_type']
 
 
 class OfferSerializer(serializers.ModelSerializer):
