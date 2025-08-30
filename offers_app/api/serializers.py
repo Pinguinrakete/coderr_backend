@@ -34,10 +34,14 @@ class OfferSerializer(serializers.ModelSerializer):
 class OfferSingleSerializer(serializers.ModelSerializer):
     pass
 
-
 class OfferSinglePatchSerializer(serializers.ModelSerializer):
     pass
 
 
 class OfferDetailsSerializer(serializers.ModelSerializer):
     pass
+
+class ImageUploadSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Offer
+        fields = ['image', 'uploaded_at']

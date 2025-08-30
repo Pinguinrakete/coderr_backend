@@ -22,5 +22,5 @@ urlpatterns = [
     path('offers/', OffersView.as_view()),
     path('offers/<int:id>/', OfferSingleView.as_view(), name='offer-specific'),
     path('offerdetails/<int:id>/', OfferDetailsView.as_view(), name='offer-detail'),
-    path('upload/', ImageUploadView.as_view(), name='file-upload')
+    path('upload/', ImageUploadView.as_view(), name='image-upload')
 ]
