@@ -1,5 +1,6 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+from django.db.models import Max
 
 """
 Model representing a user account.
@@ -27,3 +28,15 @@ class Account(AbstractUser):
     ]
 
     user_type = models.CharField(max_length=10, choices=USER_TYPE_CHOICES, default=CUSTOMER)
+    customer_user = models.PositiveIntegerField(null=True, blank=True, unique=True)
+    business_user = models.PositiveIntegerField(null=True, blank=True, unique=True)
+
+    def save(self, *args, **kwargs):
+        if not self.pk:
+            if self.user_type == self.CUSTOMER and self.customer_user is None:
+                max_id = Account.objects.filter(user_type=self.CUSTOMER).aggregate(Max('customer_user'))['customer_user__max'] or 0
+                self.customer_user = max_id + 1
+            elif self.user_type == self.BUSINESS and self.business_user is None:
+                max_id = Account.objects.filter(user_type=self.BUSINESS).aggregate(Max('business_user'))['business_user__max'] or 0
+                self.business_user = max_id + 1
+        super().save(*args, **kwargs)
