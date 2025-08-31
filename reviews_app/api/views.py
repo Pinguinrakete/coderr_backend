@@ -39,7 +39,7 @@ class ReviewSingleView(APIView):
         serializer = ReviewSinglePatchSerializer(review, data=request.data, partial=True, context={'request': request})
 
         if serializer.is_valid():
-            review = serializer.save()
+            serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
 
     def delete(self, request, id):
