@@ -11,24 +11,22 @@ media/uploads/
 core/__pycache__/
 auth_app/__pycache__/
 auth_app/api/__pycache__/
-auth_app/migrations/__pycache__/
+auth_app/migrations/
 profile_app/__pycache__/
 profile_app/api/__pycache__/
 profile_app/migrations/
-profile_app/migrations/__pycache__/
 offers_app/__pycache__/
 offers_app/api/__pycache__/
 offers_app/migrations
-offers_app/migrations/__pycache__/
 orders_app/__pycache__/
 orders_app/api/__pycache__/
-orders_app/migrations/__pycache__/
+orders_app/migrations/
 reviews_app/__pycache__/
 reviews_app/api/__pycache__/
-reviews_app/migrations/__pycache__/
+reviews_app/migrations/
 cross_cutting_endpoints_app/__pycache__/
 cross_cutting_endpoints_app/api/__pycache__/
-cross_cutting_endpoints_app/migrations/__pycache__/
+cross_cutting_endpoints_app/migrations/
 
 # Python virtual environments
 env/
