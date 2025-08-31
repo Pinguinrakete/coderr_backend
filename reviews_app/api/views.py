@@ -25,4 +25,16 @@ class ReviewsView(APIView):
 
 
 class ReviewSingleView(APIView):
-    pass
+    permission_classes = [IsAuthenticated]
+
+    def delete(self, request, id):
+        try:
+            review = Review.objects.get(pk=id)
+        except Review.DoesNotExist:
+            return Response({"detail": "Review not found."}, status=status.HTTP_404_NOT_FOUND)
+
+        if request.user.id != review.reviewer_id:
+            return Response({"detail": "Only the reviewer can delete this review."}, status=status.HTTP_403_FORBIDDEN)
+
+        review.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
