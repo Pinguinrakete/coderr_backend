@@ -34,8 +34,8 @@ class OfferSingleView(APIView):
         serializer = OfferSinglePatchSerializer(offer, data=request.data, partial=True, context={'request': request})
         
         if serializer.is_valid():
-            offer = serializer.save()
-            return Response(OfferSinglePatchSerializer(offer, context={'request': request}).data)
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
         
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
