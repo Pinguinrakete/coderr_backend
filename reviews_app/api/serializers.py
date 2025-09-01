@@ -1,6 +1,6 @@
 from rest_framework import serializers
-from reviews_app.models import Review
 from auth_app.models import Account
+from reviews_app.models import Review
 
 class ReviewSerializer(serializers.ModelSerializer):
     business_user = serializers.IntegerField(write_only=True) 
@@ -38,5 +38,8 @@ class ReviewSerializer(serializers.ModelSerializer):
 
 
 class ReviewSinglePatchSerializer(serializers.ModelSerializer):
-    pass
 
+    class Meta:
+        model = Review
+        fields = ['id', 'rating', 'description', 'created_at', 'updated_at']
+        read_only_fields = ['id', 'created_at', 'updated_at']
