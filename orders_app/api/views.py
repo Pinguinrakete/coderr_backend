@@ -2,14 +2,14 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from .serializers import OrderSerializer
+from .serializers import OrderSerializer, CreateOrderFromOfferSerializer
 from offers_app.models import Offer, OfferDetail
 
 class OrdersView(APIView):
     permission_classes = [AllowAny]
     
-    def post(self, request):
-        serializer = OrderSerializer(data=request.data, context={'request': request})
+    def post(self, request, format=None):
+        serializer = CreateOrderFromOfferSerializer(data=request.data)
         if serializer.is_valid():
             try:
                 order = serializer.save()
