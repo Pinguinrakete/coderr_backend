@@ -1,12 +1,14 @@
 from rest_framework import serializers
 from offers_app.models import Offer, OfferDetail
 
+
 class OfferDetailsSerializer(serializers.ModelSerializer):
     features = serializers.ListField(child=serializers.CharField(max_length=255), required=False, default=list)
 
     class Meta:
         model = OfferDetail
         fields = ['id', 'title', 'revisions', 'delivery_time_in_days', 'price', 'features', 'offer_type']
+
 
 class OfferSerializer(serializers.ModelSerializer):
     details = OfferDetailsSerializer(many=True) 
@@ -28,8 +30,6 @@ class OfferSerializer(serializers.ModelSerializer):
 
         return offer
     
-class OfferSingleSerializer(serializers.ModelSerializer):
-    pass
 
 class OfferSinglePatchSerializer(serializers.ModelSerializer):
     details = OfferDetailsSerializer(many=True) 

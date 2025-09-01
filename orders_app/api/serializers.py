@@ -1,6 +1,7 @@
 from rest_framework import serializers
 
-class OrdersSerializer(serializers.ModelSerializer):
+
+class OrderSerializer(serializers.ModelSerializer):
     pass
 
 
