@@ -8,8 +8,8 @@ class OrderSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Order
-        fields = ['id', 'title', 'revisions', 'price', 'delivery_time_in_days', 'created_at', 'updated_at']
-        # fields = ['id', 'customer_user', 'business_user', 'title', 'revisions', 'delivery_time_in_days', 'price', 'features', 'status, 'created_at', 'updated_at']
+        fields = ['id', 'title', 'revisions', 'delivery_time_in_days', 'price', 'features', 'offer_type', 'status', 'created_at', 'updated_at']
+        # fields = ['id', 'customer_user', 'business_user']
 
 
 class CreateOrderFromOfferSerializer(serializers.Serializer):
@@ -38,6 +38,8 @@ class CreateOrderFromOfferSerializer(serializers.Serializer):
             revisions=offer_detail.revisions,
             delivery_time_in_days=offer_detail.delivery_time_in_days,
             price=offer_detail.price,
+            features=offer_detail.features,
+            offer_type=offer_detail.offer_type,
         )
         return order
 
