@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from offers_app.models import Offer
+from offers_app.models import Offer, OfferDetail
 from orders_app.models import Order
 
 class OrderSerializer(serializers.ModelSerializer):
@@ -8,28 +8,36 @@ class OrderSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Order
-        fields = ['id', 'title', 'status', 'created_at', 'updated_at']
-        # fields = ['id', 'customer_user', 'business_user', 'title', 'revisions', 'delivery_time_in_days', 'price', 'features', 'offer_type', 'status', 'created_at', 'updated_at']
+        fields = ['id', 'title', 'revisions', 'price', 'delivery_time_in_days', 'created_at', 'updated_at']
+        # fields = ['id', 'customer_user', 'business_user', 'title', 'revisions', 'delivery_time_in_days', 'price', 'features', 'status, 'created_at', 'updated_at']
 
 
 class CreateOrderFromOfferSerializer(serializers.Serializer):
     offer_detail_id = serializers.IntegerField()
 
-    def validate_offer_id(self, value):
-        from offers_app.models import Offer
+    def validate_offer_detail_id(self, value):
         try:
-            offer = Offer.objects.get(id=value)
-        except Offer.DoesNotExist:
-            raise serializers.ValidationError("Offer does not exist.")
+            OfferDetail.objects.get(id=value)
+        except OfferDetail.DoesNotExist:
+            raise serializers.ValidationError("OfferDetail with this ID does not exist.")
         return value
 
     def create(self, validated_data):
-        print('validated_data', validated_data)
-        offer_id = validated_data['offer_detail_id']
-        offer = Offer.objects.get(id=offer_id)
+        offer_detail_id = validated_data["offer_detail_id"]
+
+        offer = Offer.objects.filter(details__id=offer_detail_id).first()
+        if not offer:
+            raise serializers.ValidationError("No offer found for this OfferDetail.")
+
+        offer_detail = offer.details.filter(id=offer_detail_id).first()
+        if not offer_detail:
+            raise serializers.ValidationError("OfferDetail not found in this offer.")
 
         order = Order.objects.create(
-            title=offer.title
+            title=offer.title,
+            revisions=offer_detail.revisions,
+            delivery_time_in_days=offer_detail.delivery_time_in_days,
+            price=offer_detail.price,
         )
         return order
 
