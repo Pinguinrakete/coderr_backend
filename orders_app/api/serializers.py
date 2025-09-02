@@ -3,7 +3,7 @@ from offers_app.models import Offer, OfferDetail
 from orders_app.models import Order
 
 class OrderSerializer(serializers.ModelSerializer):
-    # business_user = serializers.IntegerField(source='user.business_user')
+    # business_user = serializers.CharField(source='user.business_user')
     # customer_user = serializers.IntegerField(source='user.customer_user')
 
     class Meta:

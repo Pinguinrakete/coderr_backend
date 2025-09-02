@@ -30,7 +30,7 @@ class ProfileSinglePatchSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Profile
-        fields = ['first_name', 'last_name', 'location', 'tel', 'description', 'working_hours', 'email']
+        fields = ['first_name', 'last_name', 'file', 'location', 'tel', 'description', 'working_hours', 'email']
 
     def update(self, instance, validated_data):
         user_data = validated_data.pop('user', {})
