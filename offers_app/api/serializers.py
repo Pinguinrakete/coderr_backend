@@ -25,7 +25,7 @@ class OfferSerializer(serializers.ModelSerializer):
         offer = Offer.objects.create(user=user, **validated_data)
         
         for detail_data in details_data:
-            detail_obj, created = OfferDetail.objects.get_or_create(**detail_data)
+            detail_obj = OfferDetail.objects.create(**detail_data)
             offer.details.add(detail_obj)
 
         return offer
