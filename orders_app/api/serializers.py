@@ -52,7 +52,7 @@ class CreateOrderFromOfferSerializer(serializers.Serializer):
         return order
 
 
-class OrderSingleSerializer(serializers.ModelSerializer):
+class OrderSinglePatchSerializer(serializers.ModelSerializer):
     pass
 
 

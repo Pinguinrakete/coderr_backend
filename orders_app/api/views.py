@@ -2,8 +2,8 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from .serializers import OrderSerializer, CreateOrderFromOfferSerializer
-from offers_app.models import Offer, OfferDetail
+from .serializers import OrderSerializer, CreateOrderFromOfferSerializer, OrderSinglePatchSerializer
+from orders_app.models import Order
 
 class OrdersView(APIView):
     permission_classes = [AllowAny]
@@ -23,7 +23,21 @@ class OrdersView(APIView):
 
 
 class OrderSingleView(APIView):
-    pass
+    permission_classes = [IsAuthenticated]
+
+    def patch(self, request, id):
+        try:
+            order = Order.objects.get(pk=id)
+        except Order.DoesNotExist:
+            return Response({"detail": "Order not found."}, status=status.HTTP_404_NOT_FOUND)
+
+        serializer = OrderSinglePatchSerializer(order, data=request.data, partial=True, context={'request': request})
+        
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class OrderCountView(APIView):
