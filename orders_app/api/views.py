@@ -38,6 +38,20 @@ class OrderSingleView(APIView):
             return Response(serializer.data, status=status.HTTP_200_OK)
         
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    def delete(self, request, id):
+        try:
+            order = Order.objects.get(pk=id)
+        except Order.DoesNotExist:
+            return Response({"detail": "Offer not found."}, status=status.HTTP_404_NOT_FOUND)
+
+        if request.user.id != order.user_id:
+            print('request.user.id.............:',request.user.id)
+            print('order.user_id...............:',order.user_id)
+            return Response({"detail": "Only the owner can delete this Order."}, status=status.HTTP_403_FORBIDDEN)
+
+        order.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class OrderCountView(APIView):
