@@ -3,13 +3,10 @@ from offers_app.models import Offer, OfferDetail
 from orders_app.models import Order
 
 class OrderSerializer(serializers.ModelSerializer):
-    # business_user = serializers.CharField(source='user.business_user')
-    # customer_user = serializers.IntegerField(source='user.customer_user')
 
     class Meta:
         model = Order
-        fields = ['id', 'title', 'revisions', 'delivery_time_in_days', 'price', 'features', 'offer_type', 'status', 'created_at', 'updated_at']
-        # fields = ['id', 'customer_user', 'business_user']
+        fields = ['id', 'business_user', 'title', 'revisions', 'delivery_time_in_days', 'price', 'features', 'offer_type', 'status', 'created_at', 'updated_at']
 
 
 class CreateOrderFromOfferSerializer(serializers.Serializer):
@@ -34,6 +31,7 @@ class CreateOrderFromOfferSerializer(serializers.Serializer):
             raise serializers.ValidationError("OfferDetail not found in this offer.")
 
         order = Order.objects.create(
+            business_user=offer.business_user.id,
             title=offer.title,
             revisions=offer_detail.revisions,
             delivery_time_in_days=offer_detail.delivery_time_in_days,
@@ -41,7 +39,9 @@ class CreateOrderFromOfferSerializer(serializers.Serializer):
             features=offer_detail.features,
             offer_type=offer_detail.offer_type,
         )
+        print(order)
         return order
+
 
 class OrderSingleSerializer(serializers.ModelSerializer):
     pass

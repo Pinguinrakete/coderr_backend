@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from offers_app.models import Offer, OfferDetail
-from rest_framework.fields import CurrentUserDefault
 from auth_app.models import Account
+from django.contrib.auth.models import User
 
 
 class OfferDetailsSerializer(serializers.ModelSerializer):
@@ -12,43 +12,32 @@ class OfferDetailsSerializer(serializers.ModelSerializer):
         fields = ['id', 'title', 'revisions', 'delivery_time_in_days', 'price', 'features', 'offer_type']
 
 
-class CurrentBusinessUserDefault:
-    requires_context = True
-
-    def __call__(self, serializer_field):
-        user = serializer_field.context['request'].user
-        if user.user_type != Account.BUSINESS:
-            raise serializers.ValidationError("Only business users can create offers.")
-        return user
-
-
 class OfferSerializer(serializers.ModelSerializer):
     details = OfferDetailsSerializer(many=True) 
     image = serializers.ImageField(required=False, allow_null=True)
-    business_user = serializers.HiddenField(default=CurrentBusinessUserDefault())
 
     class Meta:
         model = Offer
-        fields = ['user', 'title', 'image', 'description', 'details', 'business_user']
-        read_only_fields = ['user']
-
+        fields = ['id', 'title', 'image', 'description', 'details']
+        read_only_fields = ['id']
 
     def create(self, validated_data):
         details_data = validated_data.pop('details')
         user = self.context['request'].user
 
         if user.user_type != Account.BUSINESS:
+            print('welcher User bist du?', user.user_type)
             raise serializers.ValidationError("Only business users can create offers.")
     
         validated_data['user'] = user
-        validated_data['business_user'] = user
+        validated_data['business_user'] = user.business_user
 
         offer = Offer.objects.create(**validated_data)
         
         for detail_data in details_data:
             detail_obj = OfferDetail.objects.create(**detail_data)
             offer.details.add(detail_obj)
-
+            
         return offer
 
 

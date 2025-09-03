@@ -25,4 +25,4 @@ class Offer(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     details = models.ManyToManyField(OfferDetail, blank=True)
-    business_user = models.ForeignKey(Account, on_delete=models.CASCADE, related_name='create_the_offer')
+    business_user = models.PositiveIntegerField(blank=False)
