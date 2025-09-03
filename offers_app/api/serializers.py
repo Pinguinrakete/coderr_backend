@@ -26,7 +26,6 @@ class OfferSerializer(serializers.ModelSerializer):
         user = self.context['request'].user
 
         if user.user_type != Account.BUSINESS:
-            print('welcher User bist du?', user.user_type)
             raise serializers.ValidationError("Only business users can create offers.")
     
         validated_data['user'] = user

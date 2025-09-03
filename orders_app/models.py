@@ -8,7 +8,8 @@ class StatusType(models.TextChoices):
         CANCELLED = 'cancelled', 'Cancelled'
 
 class Order(models.Model):   
-    business_user = models.PositiveIntegerField(blank=False, null=False)
+    customer_user = models.PositiveIntegerField(blank=False, null=True)
+    business_user = models.PositiveIntegerField(blank=False, null=True)
     title = models.CharField(max_length=255)
     revisions = models.PositiveIntegerField(default=0)
     delivery_time_in_days = models.PositiveIntegerField()

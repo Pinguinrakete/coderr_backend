@@ -6,7 +6,7 @@ class OrderSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Order
-        fields = ['id', 'business_user', 'title', 'revisions', 'delivery_time_in_days', 'price', 'features', 'offer_type', 'status', 'created_at', 'updated_at']
+        fields = ['id', 'customer_user','business_user', 'title', 'revisions', 'delivery_time_in_days', 'price', 'features', 'offer_type', 'status', 'created_at', 'updated_at']
 
 
 class CreateOrderFromOfferSerializer(serializers.Serializer):
@@ -31,7 +31,8 @@ class CreateOrderFromOfferSerializer(serializers.Serializer):
             raise serializers.ValidationError("OfferDetail not found in this offer.")
 
         order = Order.objects.create(
-            business_user=offer.business_user.id,
+            customer_user=offer.business_user,
+            business_user=offer.business_user,
             title=offer.title,
             revisions=offer_detail.revisions,
             delivery_time_in_days=offer_detail.delivery_time_in_days,
@@ -39,7 +40,7 @@ class CreateOrderFromOfferSerializer(serializers.Serializer):
             features=offer_detail.features,
             offer_type=offer_detail.offer_type,
         )
-        print(order)
+        print(order.__dict__)
         return order
 
 
