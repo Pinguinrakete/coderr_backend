@@ -8,6 +8,7 @@ class StatusType(models.TextChoices):
         CANCELLED = 'cancelled', 'Cancelled'
 
 class Order(models.Model):   
+    user = models.ForeignKey(Account, on_delete=models.CASCADE, related_name='orders')
     customer_user = models.PositiveIntegerField(blank=False, null=True)
     business_user = models.PositiveIntegerField(blank=False, null=True)
     title = models.CharField(max_length=255)

@@ -9,7 +9,7 @@ class OrdersView(APIView):
     permission_classes = [AllowAny]
     
     def post(self, request, format=None):
-        serializer = CreateOrderFromOfferSerializer(data=request.data)
+        serializer = CreateOrderFromOfferSerializer(data=request.data, context={'request': request})
         if serializer.is_valid():
             try:
                 order = serializer.save()
