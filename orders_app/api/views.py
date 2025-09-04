@@ -61,7 +61,12 @@ class OrderSingleView(APIView):
 
 
 class OrderCountView(APIView):
-    pass
+    permission_classes = [AllowAny]
+    
+    def get(self, request, business_user_id): 
+        orders = Order.objects.filter(Q(business_user=business_user_id) & Q(status="in_progress")).distinct()
+        serializer = OrderSerializer(orders, many=True, context={'request': request})
+        return Response(serializer.data)
 
 class CompletedOrderCountView(APIView):
     pass
