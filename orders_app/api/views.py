@@ -1,9 +1,10 @@
+from orders_app.models import Order
+from .permissions import IsStaffUser
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from .serializers import OrderSerializer, CreateOrderFromOfferSerializer, OrderSinglePatchSerializer
-from orders_app.models import Order
 
 class OrdersView(APIView):
     permission_classes = [AllowAny]
@@ -23,7 +24,12 @@ class OrdersView(APIView):
 
 
 class OrderSingleView(APIView):
-    permission_classes = [AllowAny]
+    def get_permissions(self):
+        if self.request.method == 'PATCH':
+            return [IsAuthenticated()]
+        elif self.request.method == 'DELETE':
+            return [IsStaffUser()]
+        return super().get_permissions()
 
     def patch(self, request, pk):
         try:
@@ -43,11 +49,6 @@ class OrderSingleView(APIView):
             order = Order.objects.get(pk=pk)
         except Order.DoesNotExist:
             return Response({"detail": "Order not found."}, status=status.HTTP_404_NOT_FOUND)
-
-        if request.user.id != order.user_id:
-            print('request.user.id.............:',request.user.id)
-            print('order.user_id...............:',order.user_id)
-            return Response({"detail": "Only the owner can delete this Order."}, status=status.HTTP_403_FORBIDDEN)
 
         order.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)

@@ -57,6 +57,12 @@ class OrderSinglePatchSerializer(serializers.ModelSerializer):
         fields = ['status']
         read_only_fields = ['id', 'customer_user','business_user', 'title', 'revisions', 'delivery_time_in_days', 'price', 'features', 'offer_type', 'created_at', 'updated_at']
 
+    def validate(self, data):
+        user = self.context.get('request').user
+        if user.user_type != Account.CUSTOMER:
+            raise serializers.ValidationError("Only customer users can update offers.")
+        return data
+    
     def update(self, instance, validated_data):
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
