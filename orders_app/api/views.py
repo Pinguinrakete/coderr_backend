@@ -7,6 +7,8 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from .serializers import OrderSerializer, CreateOrderFromOfferSerializer, OrderSinglePatchSerializer, OrderCountSerializer
+from django.contrib.auth.models import User
+from auth_app.models import Account
 
 class OrdersView(APIView):
     permission_classes = [AllowAny]
@@ -65,6 +67,11 @@ class OrderCountView(APIView):
     permission_classes = [AllowAny]
        
     def get(self, request, business_user_id): 
+        try:
+            Account.objects.get(business_user=business_user_id)
+        except Account.DoesNotExist:
+            return Response({"detail": "A business user with this ID does not exist."}, status=status.HTTP_404_NOT_FOUND)
+
         orders = Order.objects.filter(Q(business_user=business_user_id) & Q(status="in_progress")).distinct()
         count_in_progress = len(orders)
         serializer = OrderCountSerializer({'order_count': count_in_progress}, context={'request': request})
