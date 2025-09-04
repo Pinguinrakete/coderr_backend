@@ -10,8 +10,8 @@ from .serializers import OrderSerializer, CreateOrderFromOfferSerializer, OrderS
 class OrdersView(APIView):
     permission_classes = [AllowAny]
     
-    def get(self, request):       
-        orders = Order.objects.filter(Q(customer_user=request.user.customer_user)).distinct()
+    def get(self, request):      
+        orders = Order.objects.filter(Q(customer_user=request.user.customer_user) | Q(business_user=request.user.business_user)).distinct()
         serializer = OrderSerializer(orders, many=True, context={'request': request})
         return Response(serializer.data)
     
