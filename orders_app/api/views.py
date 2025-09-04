@@ -1,13 +1,19 @@
+from django.db.models import Q
 from orders_app.models import Order
 from .permissions import IsStaffUser
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from .serializers import OrderSerializer, CreateOrderFromOfferSerializer, OrderSinglePatchSerializer
+from .serializers import OrderSerializer, CreateOrderFromOfferSerializer, OrderSinglePatchSerializer, OrderCountSerializer
 
 class OrdersView(APIView):
     permission_classes = [AllowAny]
+    
+    def get(self, request):       
+        orders = Order.objects.filter(Q(customer_user=request.user.customer_user)).distinct()
+        serializer = OrderSerializer(orders, many=True, context={'request': request})
+        return Response(serializer.data)
     
     def post(self, request, format=None):
         serializer = CreateOrderFromOfferSerializer(data=request.data, context={'request': request})
@@ -56,7 +62,6 @@ class OrderSingleView(APIView):
 
 class OrderCountView(APIView):
     pass
-
 
 class CompletedOrderCountView(APIView):
     pass
