@@ -23,27 +23,26 @@ class OrdersView(APIView):
 
 
 class OrderSingleView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny]
 
-    def patch(self, request, id):
+    def patch(self, request, pk):
         try:
-            order = Order.objects.get(pk=id)
+            order = Order.objects.get(pk=pk)
         except Order.DoesNotExist:
             return Response({"detail": "Order not found."}, status=status.HTTP_404_NOT_FOUND)
 
         serializer = OrderSinglePatchSerializer(order, data=request.data, partial=True, context={'request': request})
-        
         if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_200_OK)
+            order = serializer.save()
+            return Response(OrderSerializer(order, context={'request': request}).data)
         
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
-    def delete(self, request, id):
+    def delete(self, request, pk):
         try:
-            order = Order.objects.get(pk=id)
+            order = Order.objects.get(pk=pk)
         except Order.DoesNotExist:
-            return Response({"detail": "Offer not found."}, status=status.HTTP_404_NOT_FOUND)
+            return Response({"detail": "Order not found."}, status=status.HTTP_404_NOT_FOUND)
 
         if request.user.id != order.user_id:
             print('request.user.id.............:',request.user.id)

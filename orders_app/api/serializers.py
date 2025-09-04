@@ -4,7 +4,6 @@ from orders_app.models import Order
 from auth_app.models import Account
 
 class OrderSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = Order
         fields = ['id', 'customer_user','business_user', 'title', 'revisions', 'delivery_time_in_days', 'price', 'features', 'offer_type', 'status', 'created_at', 'updated_at']
@@ -53,7 +52,17 @@ class CreateOrderFromOfferSerializer(serializers.Serializer):
 
 
 class OrderSinglePatchSerializer(serializers.ModelSerializer):
-    pass
+    class Meta:
+        model = Order
+        fields = ['status']
+        read_only_fields = ['id', 'customer_user','business_user', 'title', 'revisions', 'delivery_time_in_days', 'price', 'features', 'offer_type', 'created_at', 'updated_at']
+
+    def update(self, instance, validated_data):
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+
+        instance.save()
+        return instance
 
 
 class OrderCountSerializer(serializers.ModelSerializer):
