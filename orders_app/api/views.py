@@ -1,6 +1,7 @@
 from django.db.models import Q
 from orders_app.models import Order
 from .permissions import IsStaffUser
+from rest_framework.exceptions import NotFound
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework import status
 from rest_framework.response import Response
@@ -62,11 +63,14 @@ class OrderSingleView(APIView):
 
 class OrderCountView(APIView):
     permission_classes = [AllowAny]
-    
+       
     def get(self, request, business_user_id): 
         orders = Order.objects.filter(Q(business_user=business_user_id) & Q(status="in_progress")).distinct()
-        serializer = OrderSerializer(orders, many=True, context={'request': request})
+        count_in_progress = len(orders)
+        serializer = OrderCountSerializer({'order_count': count_in_progress}, context={'request': request})
+
         return Response(serializer.data)
+    
 
 class CompletedOrderCountView(APIView):
     pass

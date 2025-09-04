@@ -71,8 +71,8 @@ class OrderSinglePatchSerializer(serializers.ModelSerializer):
         return instance
 
 
-class OrderCountSerializer(serializers.ModelSerializer):
-    pass
+class OrderCountSerializer(serializers.Serializer):
+    order_count = serializers.IntegerField()
 
 
 class CompletedOrderSerializer(serializers.ModelSerializer):
