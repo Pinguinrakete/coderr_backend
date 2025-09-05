@@ -75,6 +75,6 @@ class OrderCountSerializer(serializers.Serializer):
     order_count = serializers.IntegerField()
 
 
-class CompletedOrderSerializer(serializers.ModelSerializer):
-    pass
+class CompletedOrderSerializer(serializers.Serializer):
+    completed_order_count = serializers.IntegerField()
 

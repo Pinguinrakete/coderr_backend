@@ -6,7 +6,7 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from .serializers import OrderSerializer, CreateOrderFromOfferSerializer, OrderSinglePatchSerializer, OrderCountSerializer
+from .serializers import OrderSerializer, CreateOrderFromOfferSerializer, OrderSinglePatchSerializer, OrderCountSerializer, CompletedOrderSerializer
 from django.contrib.auth.models import User
 from auth_app.models import Account
 
@@ -80,4 +80,16 @@ class OrderCountView(APIView):
     
 
 class CompletedOrderCountView(APIView):
-    pass
+    permission_classes = [AllowAny]
+       
+    def get(self, request, business_user_id): 
+        try:
+            Account.objects.get(business_user=business_user_id)
+        except Account.DoesNotExist:
+            return Response({"detail": "A business user with this ID does not exist."}, status=status.HTTP_404_NOT_FOUND)
+
+        orders = Order.objects.filter(Q(business_user=business_user_id) & Q(status="completed")).distinct()
+        count_completed = len(orders)
+        serializer = CompletedOrderSerializer({'completed_order_count': count_completed}, context={'request': request})
+
+        return Response(serializer.data)
