@@ -1,4 +1,4 @@
 from rest_framework import serializers
 
-class BaseInfoSerializer(serializers.ModelSerializer):
-    pass
+class BusinesProfileCountSerializer(serializers.Serializer):
+    business_profile_count = serializers.IntegerField()
