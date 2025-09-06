@@ -5,19 +5,23 @@ from rest_framework.response import Response
 from rest_framework import status
 from .serializers import BusinesProfileCountSerializer
 from auth_app.models import Account
+from offers_app.models import Offer
 
 class BaseInfoView(APIView):
     permission_classes = [AllowAny]
        
     def get(self, request):
         try:
-            user = Account.objects.exclude(business_user=None).values_list('business_user', flat=True).distinct()
-            offer_count = len(user)
+            business_user_count = Account.objects.exclude(business_user=None).count()
+            offer_count = Offer.objects.count() 
 
-            if offer_count == 0:
-                return Response({"detail": "Business doesn't exist"}, status=status.HTTP_404_NOT_FOUND)
-
-            serializer = BusinesProfileCountSerializer({'business_profile_count': offer_count}, context={'request': request})
+            serializer = BusinesProfileCountSerializer(
+                    {
+                        'business_profile_count': business_user_count,
+                        'offer_count': offer_count 
+                    }, 
+                    context={'request': request}
+                )
             return Response(serializer.data, status=status.HTTP_200_OK)
         
         except Exception as e:
