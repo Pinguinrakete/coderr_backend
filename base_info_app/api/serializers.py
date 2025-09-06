@@ -1,5 +1,6 @@
 from rest_framework import serializers
 
-class BusinesProfileCountSerializer(serializers.Serializer):
+class BaseInfoSerializer(serializers.Serializer):
+    review_count = serializers.IntegerField()
     business_profile_count = serializers.IntegerField()
     offer_count = serializers.IntegerField()
