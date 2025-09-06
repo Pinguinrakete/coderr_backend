@@ -64,7 +64,7 @@ class OrderSingleView(APIView):
 
 
 class OrderCountView(APIView):
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
        
     def get(self, request, business_user_id): 
         try:
@@ -80,7 +80,7 @@ class OrderCountView(APIView):
     
 
 class CompletedOrderCountView(APIView):
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
        
     def get(self, request, business_user_id): 
         try:
