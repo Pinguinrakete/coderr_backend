@@ -34,8 +34,6 @@ class ReviewSingleView(APIView):
             return Response({"detail": "Review not found."}, status=status.HTTP_404_NOT_FOUND)
 
         if request.user.id != review.reviewer_id:
-            print('request.user.id............_:', request.user.id)
-            print('review.reviewer_id............_:', review.reviewer_id)
             return Response({"detail": "Only the reviewer can update this review."}, status=status.HTTP_403_FORBIDDEN)     
         serializer = ReviewSinglePatchSerializer(review, data=request.data, partial=True, context={'request': request})
 

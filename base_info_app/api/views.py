@@ -14,12 +14,16 @@ class BaseInfoView(APIView):
     def get(self, request):
         try:
             review_count = Review.objects.count()
+            rating_list = Review.objects.values_list('rating', flat=True)
             business_user_count = Account.objects.exclude(business_user=None).count()
             offer_count = Offer.objects.count() 
+
+            average_rating = sum(rating_list) / len(rating_list) if rating_list else 0
 
             serializer = BaseInfoSerializer(
                     {
                         'review_count': review_count,
+                        'average_rating': average_rating,
                         'business_profile_count': business_user_count,
                         'offer_count': offer_count 
                     }, 
