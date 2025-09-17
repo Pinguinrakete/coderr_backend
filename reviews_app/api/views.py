@@ -9,7 +9,25 @@ from .serializers import ReviewSerializer, ReviewSinglePatchSerializer
 
 class ReviewsView(APIView):
     permission_classes = [IsAuthenticated]
+
+    def get(self, request):  
+        try:
+            business_user_id = request.query_params.get('business_user_id')
+            reviewer_id = request.query_params.get('reviewer_id')
+            ordering = request.query_params.get('ordering')
+            
+            reviews = Review.objects.all()
+
+            if reviewer_id:
+                reviews = reviews.filter(reviewer_id=reviewer_id)
+
+            serializer = ReviewSerializer(reviews, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
     
+        
     def post(self, request):
         serializer = ReviewSerializer(data=request.data, context={'request': request})
         try:
