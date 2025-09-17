@@ -24,6 +24,9 @@ class ReviewsView(APIView):
             if reviewer_id:
                 reviews = reviews.filter(reviewer_id=reviewer_id)
 
+            if ordering in ['updated_at', 'rating']:
+                reviews = reviews.order_by(ordering)
+
             serializer = ReviewSerializer(reviews, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
         
