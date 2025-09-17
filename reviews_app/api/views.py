@@ -18,6 +18,9 @@ class ReviewsView(APIView):
             
             reviews = Review.objects.all()
 
+            if business_user_id:
+                reviews = reviews.filter(business_user=business_user_id)
+
             if reviewer_id:
                 reviews = reviews.filter(reviewer_id=reviewer_id)
 
