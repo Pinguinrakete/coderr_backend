@@ -1,7 +1,6 @@
 from rest_framework import serializers
 from offers_app.models import Offer, OfferDetail
 from auth_app.models import Account
-from django.contrib.auth.models import User
 
 
 class OfferDetailsSerializer(serializers.ModelSerializer):
@@ -38,6 +37,42 @@ class OfferSerializer(serializers.ModelSerializer):
             offer.details.add(detail_obj)
             
         return offer
+
+
+class OfferDetailMiniSerializer(serializers.ModelSerializer):
+    url = serializers.SerializerMethodField()
+
+    class Meta:
+        model = OfferDetail
+        fields = ['id', 'url']
+
+    def get_url(self, obj):
+        return f"/offerdetails/{obj.id}/"
+
+
+class UserDetailsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Account
+        fields = ['first_name', 'last_name', 'username']
+
+
+class OfferListSerializer(serializers.ModelSerializer):
+    details = OfferDetailMiniSerializer(many=True)
+    min_price = serializers.SerializerMethodField()
+    min_delivery_time = serializers.SerializerMethodField()
+    user_details = UserDetailsSerializer(source='user')
+
+    class Meta:
+        model = Offer
+        fields = ['id', 'user', 'title', 'image', 'description', 'created_at', 'updated_at', 'details', 'min_price', 'min_delivery_time', 'user_details']
+
+    def get_min_price(self, obj):
+        prices = obj.details.values_list('price', flat=True)
+        return min(prices) if prices else None
+
+    def get_min_delivery_time(self, obj):
+        times = obj.details.values_list('delivery_time_in_days', flat=True)
+        return min(times) if times else None
 
 
 class OfferSinglePatchSerializer(serializers.ModelSerializer):

@@ -2,12 +2,60 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from .serializers import OfferSerializer, OfferDetailsSerializer, OfferSinglePatchSerializer, ImageUploadSerializer
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from .serializers import OfferSerializer, OfferDetailsSerializer, OfferListSerializer, OfferSinglePatchSerializer, ImageUploadSerializer
 from offers_app.models import Offer, OfferDetail
+from django.core.paginator import Paginator
+from .filters import apply_offer_filters, apply_offer_ordering
 
 class OffersView(APIView):
     permission_classes = [IsAuthenticated]
     
+    def get(self, request):
+        try:
+            offers = Offer.objects.prefetch_related('details').select_related('user')
+
+            try:
+                offers = apply_offer_filters(offers, request.query_params)
+            except Exception as e:
+                return Response({'error': f'Error while filtering the offers: {str(e)}'}, status=status.HTTP_400_BAD_REQUEST)
+
+            ordering = request.query_params.get('ordering')
+            try:
+                offers = apply_offer_ordering(offers, ordering)
+            except Exception as e:
+                return Response({'error': f'Error while sorting the offers: {str(e)}'}, status=status.HTTP_400_BAD_REQUEST)
+
+            try:
+                page_size = int(request.query_params.get('page_size', 6))
+                page = int(request.query_params.get('page', 1))
+            except ValueError:
+                return Response({'error': 'Invalid value for page or page_size. Both must be integers.'}, status=status.HTTP_400_BAD_REQUEST)
+
+            paginator = Paginator(offers, page_size)
+            try:
+                paged_offers = paginator.page(page)
+            except PageNotAnInteger:
+                return Response({'error': 'Page number is not a valid integer.'}, status=status.HTTP_400_BAD_REQUEST)
+            except EmptyPage:
+                return Response({'error': 'The requested page is empty or out of the valid range.'}, status=status.HTTP_404_NOT_FOUND)
+
+            serializer = OfferListSerializer(paged_offers, many=True)
+
+            base_url = request.build_absolute_uri('?').split('?')[0]
+            next_url = f'{base_url}?page={page + 1}' if paged_offers.has_next() else None
+            prev_url = f'{base_url}?page={page - 1}' if paged_offers.has_previous() else None
+
+            return Response({
+                'count': paginator.count,
+                'next': next_url,
+                'previous': prev_url,
+                'results': serializer.data
+            }, status=status.HTTP_200_OK)
+
+        except Exception as e:
+            return Response({'error': f'Unerwarteter Fehler: {str(e)}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
     def post(self, request):
         serializer = OfferSerializer(data=request.data, context={'request': request})
         if serializer.is_valid():

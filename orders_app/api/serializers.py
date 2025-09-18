@@ -26,27 +26,27 @@ class CreateOrderFromOfferSerializer(serializers.Serializer):
         return data
 
     def create(self, validated_data):
-        offer_detail_id = validated_data["offer_detail_id"]
+        order_detail_id = validated_data["offer_detail_id"]
         user = self.context['request'].user
 
-        offer = Offer.objects.filter(details__id=offer_detail_id).first()
-        if not offer:
+        order = Offer.objects.filter(details__id=order_detail_id).first()
+        if not order:
             raise serializers.ValidationError("No offer found for this OfferDetail.")
 
-        offer_detail = offer.details.filter(id=offer_detail_id).first()
-        if not offer_detail:
+        order_detail = order.details.filter(id=order_detail_id).first()
+        if not order_detail:
             raise serializers.ValidationError("OfferDetail not found in this offer.")
 
         order = Order.objects.create(
             user=user,
             customer_user=user.customer_user,
-            business_user=offer.business_user,
-            title=offer.title,
-            revisions=offer_detail.revisions,
-            delivery_time_in_days=offer_detail.delivery_time_in_days,
-            price=offer_detail.price,
-            features=offer_detail.features,
-            offer_type=offer_detail.offer_type,
+            business_user=order.business_user,
+            title=order.title,
+            revisions=order_detail.revisions,
+            delivery_time_in_days=order_detail.delivery_time_in_days,
+            price=order_detail.price,
+            features=order_detail.features,
+            offer_type=order_detail.offer_type,
         )
         return order
 
