@@ -3,7 +3,7 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-from .serializers import OfferSerializer, OfferDetailsSerializer, OfferListSerializer, OfferSinglePatchSerializer, ImageUploadSerializer
+from .serializers import OfferSerializer, OfferDetailsSerializer, OfferListSerializer, OfferListSingleSerializer, OfferSinglePatchSerializer, ImageUploadSerializer
 from offers_app.models import Offer, OfferDetail
 from django.core.paginator import Paginator
 from .filters import apply_offer_filters, apply_offer_ordering
@@ -54,7 +54,7 @@ class OffersView(APIView):
             }, status=status.HTTP_200_OK)
 
         except Exception as e:
-            return Response({'error': f'Unerwarteter Fehler: {str(e)}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response({'error': f'Unexpected error: {str(e)}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     def post(self, request):
         serializer = OfferSerializer(data=request.data, context={'request': request})
@@ -72,6 +72,17 @@ class OffersView(APIView):
 
 class OfferSingleView(APIView):
     permission_classes = [IsAuthenticated]
+
+    def get(self, request, id):
+        try:
+            offer = Offer.objects.prefetch_related('details').select_related('user').get(pk=id)
+            serializer = OfferListSingleSerializer(offer, context={'request': request})
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except Offer.DoesNotExist:
+            return Response({'error': 'Offer not found.'}, status=status.HTTP_404_NOT_FOUND)
+        
+        except Exception as e:
+            return Response({'error': f'Unexpected error: {str(e)}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     def patch(self, request, id):
         try:

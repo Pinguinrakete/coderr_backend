@@ -3,7 +3,7 @@ from django.db.models import Q
 def apply_offer_filters(queryset, params):
     creator_id = params.get('creator_id')
     if creator_id:
-        queryset = queryset.filter(user_id=creator_id)
+        queryset = queryset.filter(business_user=creator_id)
 
     min_price = params.get('min_price')
     if min_price:

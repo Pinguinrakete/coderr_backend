@@ -75,6 +75,24 @@ class OfferListSerializer(serializers.ModelSerializer):
         return min(times) if times else None
 
 
+class OfferListSingleSerializer(serializers.ModelSerializer):
+    details = OfferDetailMiniSerializer(many=True)
+    min_price = serializers.SerializerMethodField()
+    min_delivery_time = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Offer
+        fields = ['id', 'user', 'title', 'image', 'description', 'created_at', 'updated_at', 'details', 'min_price', 'min_delivery_time']
+
+    def get_min_price(self, obj):
+        prices = obj.details.values_list('price', flat=True)
+        return min(prices) if prices else None
+
+    def get_min_delivery_time(self, obj):
+        times = obj.details.values_list('delivery_time_in_days', flat=True)
+        return min(times) if times else None
+    
+
 class OfferSinglePatchSerializer(serializers.ModelSerializer):
     details = OfferDetailsSerializer(many=True) 
     image = serializers.ImageField(required=False, allow_null=True)
