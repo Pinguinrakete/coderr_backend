@@ -2,7 +2,13 @@ from rest_framework import serializers
 from offers_app.models import Offer, OfferDetail
 from auth_app.models import Account
 
+"""
+Serializer for OfferDetail model.
 
+Fields:
+- id, title, revisions, delivery_time_in_days, price, offer_type
+- features: optional list of feature strings (default: empty list)
+"""
 class OfferDetailsSerializer(serializers.ModelSerializer):
     features = serializers.ListField(child=serializers.CharField(max_length=255), required=False, default=list)
     
@@ -10,7 +16,20 @@ class OfferDetailsSerializer(serializers.ModelSerializer):
         model = OfferDetail
         fields = ['id', 'title', 'revisions', 'delivery_time_in_days', 'price', 'features', 'offer_type']
 
+"""
+Serializer for Offer model with nested offer details.
 
+Fields:
+- id (read-only)
+- title
+- image (optional)
+- description
+- details (list of nested OfferDetailsSerializer)
+
+Notes:
+- Only business users can create offers; others get a validation error.
+- Creates related OfferDetail instances when creating an Offer.
+"""
 class OfferSerializer(serializers.ModelSerializer):
     details = OfferDetailsSerializer(many=True) 
     image = serializers.ImageField(required=False, allow_null=True)
@@ -38,7 +57,13 @@ class OfferSerializer(serializers.ModelSerializer):
             
         return offer
 
+"""
+Minimal serializer for OfferDetail.
 
+Fields:
+- id
+- url: URL to the offer detail's API endpoint (e.g., /offerdetails/<id>/)
+"""
 class OfferDetailMiniSerializer(serializers.ModelSerializer):
     url = serializers.SerializerMethodField()
 
@@ -49,13 +74,29 @@ class OfferDetailMiniSerializer(serializers.ModelSerializer):
     def get_url(self, obj):
         return f"/offerdetails/{obj.id}/"
 
+"""
+Serializer for basic user details.
 
+Fields:
+- first_name
+- last_name
+- username
+"""
 class UserDetailsSerializer(serializers.ModelSerializer):
     class Meta:
         model = Account
         fields = ['first_name', 'last_name', 'username']
 
+"""
+Serializer for listing offers with summary details.
 
+Fields:
+- id, user, title, image, description, created_at, updated_at
+- details: list of minimal offer details (OfferDetailMiniSerializer)
+- min_price: lowest price among the offer details
+- min_delivery_time: shortest delivery time among the offer details
+- user_details: basic user info (UserDetailsSerializer)
+"""
 class OfferListSerializer(serializers.ModelSerializer):
     details = OfferDetailMiniSerializer(many=True)
     min_price = serializers.SerializerMethodField()
@@ -74,7 +115,15 @@ class OfferListSerializer(serializers.ModelSerializer):
         times = obj.details.values_list('delivery_time_in_days', flat=True)
         return min(times) if times else None
 
+"""
+Serializer for a single offer with summarized details.
 
+Fields:
+- id, user, title, image, description, created_at, updated_at
+- details: list of minimal offer details (OfferDetailMiniSerializer)
+- min_price: lowest price among the offer details
+- min_delivery_time: shortest delivery time among the offer details
+"""
 class OfferListSingleSerializer(serializers.ModelSerializer):
     details = OfferDetailMiniSerializer(many=True)
     min_price = serializers.SerializerMethodField()
@@ -92,7 +141,20 @@ class OfferListSingleSerializer(serializers.ModelSerializer):
         times = obj.details.values_list('delivery_time_in_days', flat=True)
         return min(times) if times else None
     
+"""
+Serializer for partial updates of an Offer.
 
+Fields:
+- title
+- image (optional)
+- description
+- details (list of OfferDetailsSerializer)
+
+Notes:
+- The user field is read-only.
+- Updates offer fields and replaces related offer details.
+- Existing details are cleared and new ones added (created if needed).
+"""
 class OfferSinglePatchSerializer(serializers.ModelSerializer):
     details = OfferDetailsSerializer(many=True) 
     image = serializers.ImageField(required=False, allow_null=True)
@@ -118,6 +180,13 @@ class OfferSinglePatchSerializer(serializers.ModelSerializer):
 
         return instance
 
+"""
+Serializer for uploading or updating an offer's image.
+
+Fields:
+- image: The image file.
+- uploaded_at: Timestamp of the upload.
+"""
 class ImageUploadSerializer(serializers.ModelSerializer):
     class Meta:
         model = Offer

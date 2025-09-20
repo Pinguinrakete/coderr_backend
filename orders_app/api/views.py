@@ -10,6 +10,27 @@ from .serializers import OrderSerializer, CreateOrderFromOfferSerializer, OrderS
 from django.contrib.auth.models import User
 from auth_app.models import Account
 
+"""
+Handles listing and creation of orders.
+
+Permissions:
+- Allows any user (authenticated or not) to access.
+
+Methods:
+
+GET:
+- Retrieves orders where the requesting user is either the customer or business user.
+- Returns a serialized list of orders.
+
+POST:
+- Creates a new order from provided data.
+- Uses CreateOrderFromOfferSerializer for validation and creation.
+- Returns the created order data on success.
+
+Errors:
+- 400 on validation errors.
+- 500 on unexpected server errors with error detail.
+"""
 class OrdersView(APIView):
     permission_classes = [AllowAny]
     
@@ -31,7 +52,27 @@ class OrdersView(APIView):
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+"""
+Handles partial update and deletion of a single order.
 
+Permissions:
+- PATCH: Requires authenticated user.
+- DELETE: Requires staff user.
+- Other methods: default permissions.
+
+Methods:
+
+PATCH:
+- Partially updates an order by its primary key.
+- Returns the updated order data on success.
+- 400 on validation errors.
+- 404 if the order does not exist.
+
+DELETE:
+- Deletes an order by its primary key.
+- 204 on successful deletion.
+- 404 if the order does not exist.
+"""
 class OrderSingleView(APIView):
     def get_permissions(self):
         if self.request.method == 'PATCH':
@@ -62,7 +103,20 @@ class OrderSingleView(APIView):
         order.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
+"""
+Returns the count of in-progress orders for a specific business user.
 
+Permissions:
+- Requires authentication.
+
+GET:
+- Path parameter: business_user_id (int) — ID of the business user.
+- Checks if the business user exists.
+- Returns the count of orders with status 'in_progress' for the given business user.
+
+Errors:
+- 404 if the business user does not exist.
+"""
 class OrderCountView(APIView):
     permission_classes = [IsAuthenticated]
        
@@ -78,7 +132,20 @@ class OrderCountView(APIView):
 
         return Response(serializer.data)
     
+"""
+Returns the count of completed orders for a specific business user.
 
+Permissions:
+- Requires authentication.
+
+GET:
+- Path parameter: business_user_id (int) — ID of the business user.
+- Validates existence of the business user.
+- Returns the count of orders with status 'completed' for the specified business user.
+
+Errors:
+- 404 if the business user does not exist.
+"""
 class CompletedOrderCountView(APIView):
     permission_classes = [IsAuthenticated]
        

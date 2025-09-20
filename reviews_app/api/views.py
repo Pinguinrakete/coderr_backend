@@ -7,6 +7,31 @@ from rest_framework.views import APIView
 from reviews_app.models import Review
 from .serializers import ReviewSerializer, ReviewSinglePatchSerializer
 
+"""
+Handles listing and creation of reviews.
+
+Permissions:
+- Requires authentication (IsAuthenticated)
+
+GET /reviews/:
+- Returns a list of reviews.
+- Optional query parameters:
+    - business_user_id (int): Filter by business user ID.
+    - reviewer_id (int): Filter by reviewer ID.
+    - ordering (str): Optional ordering ('updated_at' or 'rating').
+
+Returns:
+- 200: List of matching reviews.
+- 400: Invalid query or server-side error.
+
+POST /reviews/:
+- Creates a new review.
+- Expects: business_user (int), rating (1–5), description (optional).
+- Returns:
+    - 201: Created review.
+    - 400: Validation error.
+    - 500: Unexpected server error.
+"""
 class ReviewsView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -48,7 +73,28 @@ class ReviewsView(APIView):
             print(traceback.format_exc())
             return Response({'detail': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+"""
+Handles updating and deleting a single review.
 
+Permissions:
+- Authenticated users only.
+- Only the original reviewer may update or delete the review.
+
+PATCH /reviews/<id>/:
+- Partially updates a review.
+- Returns:
+    - 200: Updated review.
+    - 403: Not the owner.
+    - 404: Review not found.
+    - 400: Validation error.
+
+DELETE /reviews/<id>/:
+- Deletes a review.
+- Returns:
+    - 204: Successfully deleted.
+    - 403: Not the owner.
+    - 404: Review not found.
+"""
 class ReviewSingleView(APIView):
     permission_classes = [IsAuthenticated]
 

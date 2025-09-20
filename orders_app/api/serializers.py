@@ -3,12 +3,35 @@ from offers_app.models import Offer, OfferDetail
 from orders_app.models import Order
 from auth_app.models import Account
 
+"""
+Serializer for the Order model.
+
+Fields:
+- id, customer_user, business_user, title, revisions, delivery_time_in_days, price, features, offer_type, status, created_at, updated_at
+"""
 class OrderSerializer(serializers.ModelSerializer):
     class Meta:
         model = Order
         fields = ['id', 'customer_user','business_user', 'title', 'revisions', 'delivery_time_in_days', 'price', 'features', 'offer_type', 'status', 'created_at', 'updated_at']
 
+"""
+Serializer to create an Order from an OfferDetail.
 
+Fields:
+- offer_detail_id (int): ID of the OfferDetail to base the order on.
+
+Validation:
+- Checks that the OfferDetail with the given ID exists.
+- Ensures the requesting user is a customer (not business).
+
+Creation:
+- Finds the related Offer and OfferDetail.
+- Creates an Order using data from the Offer and OfferDetail.
+- Associates the order with the requesting customer user and the business user from the offer.
+
+Raises:
+- ValidationError if OfferDetail or Offer is not found or user is not a customer.
+"""
 class CreateOrderFromOfferSerializer(serializers.Serializer):
     offer_detail_id = serializers.IntegerField()
 
@@ -50,7 +73,19 @@ class CreateOrderFromOfferSerializer(serializers.Serializer):
         )
         return order
 
+"""
+Serializer for partial updates of an Order's status.
 
+Fields:
+- status (writable)
+- Other fields are read-only.
+
+Validation:
+- Only users with user_type CUSTOMER can update.
+
+Update:
+- Applies validated fields to the instance and saves it.
+"""
 class OrderSinglePatchSerializer(serializers.ModelSerializer):
     class Meta:
         model = Order
@@ -70,11 +105,21 @@ class OrderSinglePatchSerializer(serializers.ModelSerializer):
         instance.save()
         return instance
 
+"""
+Serializer for returning the count of orders.
 
+Fields:
+- order_count (int): Number of orders.
+"""
 class OrderCountSerializer(serializers.Serializer):
     order_count = serializers.IntegerField()
 
 
+"""
+Serializer for returning the count of completed orders.
+
+Fields:
+- completed_order_count (int): Number of completed orders.
+"""
 class CompletedOrderSerializer(serializers.Serializer):
     completed_order_count = serializers.IntegerField()
-

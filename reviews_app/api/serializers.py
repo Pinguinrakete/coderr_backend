@@ -4,6 +4,24 @@ from reviews_app.models import Review
 from rest_framework.exceptions import ValidationError
 from django.db.models import Q
 
+"""
+Serializer for creating and retrieving reviews.
+
+Fields:
+- id (int, read-only): Review ID.
+- business_user (int): ID of the reviewed business user.
+- reviewer (int, read-only): ID of the user leaving the review (auto-assigned).
+- rating (int): Value from 1 to 5.
+- description (str): Optional review content.
+- created_at / updated_at (datetime, read-only): Timestamps.
+
+Validations:
+- Only users with `user_type="customer"` may create reviews.
+- `business_user` must be a valid business account (ID must exist in allowed set).
+
+On creation:
+- Reviewer is automatically set to the authenticated user.
+"""
 class ReviewSerializer(serializers.ModelSerializer):
     business_user = serializers.IntegerField(min_value=1)
     reviewer = serializers.PrimaryKeyRelatedField(read_only=True)
@@ -36,7 +54,18 @@ class ReviewSerializer(serializers.ModelSerializer):
 
         return super().create(validated_data)
 
+"""
+Serializer for partial updates to a review.
 
+Fields:
+- id (int, read-only): Review ID.
+- rating (int): Updated rating (1–5).
+- description (str): Updated review text.
+- created_at / updated_at (datetime, read-only): Timestamps.
+
+Usage:
+- Used in PATCH requests to update the `rating` and/or `description` of an existing review.
+"""
 class ReviewSinglePatchSerializer(serializers.ModelSerializer):
 
     class Meta:

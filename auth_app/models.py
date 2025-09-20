@@ -5,6 +5,9 @@ from django.db.models import Max
 """
 Model representing a user account.
 
+Inherits from:
+- AbstractUser: Provides default Django user fields like username, email, and password.
+
 Fields:
 - username (CharField): Inherited from AbstractUser. The unique username of the account.
 - email (EmailField): Inherited from AbstractUser. The user's email address.
@@ -14,9 +17,12 @@ Fields:
         - "customer": Regular customer account.
         - "business": Business account.
     Default: "customer".
+- customer_user (PositiveIntegerField): Unique incremental ID for customer accounts. Auto-assigned on creation.
+- business_user (PositiveIntegerField): Unique incremental ID for business accounts. Auto-assigned on creation.
 
 Methods:
-- __str__(): Returns the username as the string representation of the account.
+- save(*args, **kwargs): Overrides the default save method to assign a sequential ID
+  to either customer_user or business_user depending on the user_type, if not already set.
 """
 class Account(AbstractUser):
     CUSTOMER = 'customer'

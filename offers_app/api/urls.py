@@ -2,21 +2,28 @@ from django.urls import path
 from .views import OffersView, OfferSingleView, OfferDetailsView, ImageUploadView
 
 """
-URL patterns for offers management.
+URL Patterns for Offer-related API endpoints.
 
 Endpoints:
 
-- GET /offers/
-  Retrieves a list of all offers.
-  Returns: list of offers.
+GET, POST /offers/
+- Handled by OffersView
+- List all offers or create a new offer.
 
-- GET /offers/<int:id>/
-  Retrieves details of a specific offer identified by its ID.
-  Returns: offer data or 404 if not found.
+GET, PATCH, DELETE /offers/<int:id>/
+- Handled by OfferSingleView
+- Retrieve, partially update, or delete a specific offer by ID.
+- URL name: 'offer-specific'
 
-- GET /offerdetails/<int:id>/
-  Retrieves detailed information for a specific offer identified by its ID.
-  Returns: detailed offer data or 404 if not found.
+GET /offerdetails/<int:id>/
+- Handled by OfferDetailsView
+- Retrieve details of a specific offer detail by ID.
+- URL name: 'offer-detail'
+
+PATCH /upload/
+- Handled by ImageUploadView
+- Upload or update an image for an existing offer.
+- URL name: 'image-upload'
 """
 urlpatterns = [
     path('offers/', OffersView.as_view()),

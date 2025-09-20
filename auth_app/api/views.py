@@ -35,7 +35,7 @@ class RegistrationView(APIView):
 This handles the user login.
 
 Method: POST
-Accepts: email and password.
+Accepts: username and password.
 Returns: user data on success or authentication error.
 """
 class LoginView(APIView):

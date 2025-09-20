@@ -4,21 +4,16 @@ from django.urls import path
 from .views import ProfileSingleView, ProfilesBusinessView, ProfilesCustomerView, FileUploadView
 
 """
-URL patterns for user profiles management.
+URL patterns for Profile-related views.
 
 Endpoints:
+- GET, PATCH /profile/<pk>/ : Retrieve or update a specific user profile by user ID.
+- GET /profiles/business/   : List all business user profiles.
+- GET /profiles/customer/   : List all customer user profiles.
+- PATCH /upload/            : Upload or update file for a user profile.
 
-- GET /profile/<int:pk>/
-  Retrieves the profile of a user identified by primary key (pk).
-  Returns: user profile data or 404 if not found.
-
-- GET /profiles/business/
-  Retrieves a list of all business user profiles.
-  Returns: list of business profiles.
-
-- GET /profiles/customer/
-  Retrieves a list of all customer user profiles.
-  Returns: list of customer profiles.
+Additional:
+- Serves media files in development mode when DEBUG=True.
 """
 urlpatterns = [
     path('profile/<int:pk>/', ProfileSingleView.as_view(), name='profile-detail'),

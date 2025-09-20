@@ -1,6 +1,29 @@
 from django.db import models
 from auth_app.models import Account
 
+"""
+Model definitions for service offers and their details.
+
+OfferType:
+- Enum for offer types: BASIC, STANDARD, PREMIUM.
+
+OfferDetail:
+- title (str): Name of the offer detail.
+- revisions (int): Number of revisions allowed (default 0).
+- delivery_time_in_days (int): Delivery time estimate.
+- price (decimal): Price of this detail.
+- features (JSON list): Optional list of features.
+- offer_type (str): Type/category of the offer detail (default STANDARD).
+
+Offer:
+- user (FK): Owner account.
+- title (str): Offer title.
+- image (file): Optional image for the offer.
+- description (str): Text description (optional).
+- created_at, updated_at: Timestamps.
+- details (M2M): Related OfferDetail instances.
+- business_user (int): ID referencing business user (required).
+"""
 class OfferType(models.TextChoices):
         BASIC = 'basic', 'Basic'
         STANDARD = 'standard', 'Standard'
