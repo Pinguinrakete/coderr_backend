@@ -1,6 +1,7 @@
+from auth_app.models import Account
 from rest_framework import serializers
 from offers_app.models import Offer, OfferDetail
-from auth_app.models import Account
+from rest_framework.reverse import reverse
 
 """
 Serializer for OfferDetail model.
@@ -77,7 +78,8 @@ class OfferDetailMiniSerializer(serializers.ModelSerializer):
         fields = ['id', 'url']
 
     def get_url(self, obj):
-        return f"/offerdetails/{obj.id}/"
+        request = self.context.get('request')
+        return reverse('offer-detail', args=[obj.id], request=request)
 
 """
 Serializer for basic user details.

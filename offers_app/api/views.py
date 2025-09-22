@@ -230,7 +230,7 @@ Returns:
 - 200 on success.
 - 404 if the offer detail does not exist.
 """
-class OfferDetailsView(APIView):
+class OfferDetailView(APIView):
     permission_classes = [AllowAny]
     
     def get(self, request, id):

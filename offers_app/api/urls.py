@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import OffersView, OfferSingleView, OfferDetailsView, ImageUploadView
+from .views import OffersView, OfferSingleView, OfferDetailView, ImageUploadView
 
 """
 URL Patterns for Offer-related API endpoints.
@@ -28,6 +28,6 @@ PATCH /upload/
 urlpatterns = [
     path('offers/', OffersView.as_view()),
     path('offers/<int:id>/', OfferSingleView.as_view(), name='offer-specific'),
-    path('offerdetails/<int:id>/', OfferDetailsView.as_view(), name='offer-detail'),
+    path('offerdetails/<int:id>/', OfferDetailView.as_view(), name='offer-detail'),
     path('upload/', ImageUploadView.as_view(), name='image-upload')
 ]
