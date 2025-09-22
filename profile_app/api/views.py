@@ -22,7 +22,7 @@ PATCH /profiles/<pk>/:
 - Returns validation errors with status 400 if invalid.
 """
 class ProfileSingleView(APIView):
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
     
     def get(self, request, pk):
         try:
@@ -38,6 +38,9 @@ class ProfileSingleView(APIView):
             profile = Profile.objects.get(user__pk=pk)
         except Profile.DoesNotExist:
             return Response({"detail": "Profile not found."}, status=status.HTTP_404_NOT_FOUND)
+        
+        if profile.user != request.user:
+            return Response({"detail": "You do not have permission to edit this profile."}, status=status.HTTP_403_FORBIDDEN)
 
         serializer = ProfileSinglePatchSerializer(profile, data=request.data, partial=True, context={'request': request})
         if serializer.is_valid():
@@ -57,7 +60,7 @@ GET /profiles/business/:
 - If no profiles found, returns 404 with a relevant message.
 """
 class ProfilesBusinessView(APIView):
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
 
     def get(self, request):
         try:
@@ -79,7 +82,7 @@ GET /profiles/customer/:
 - If no profiles found, returns 404 with a relevant message.
 """
 class ProfilesCustomerView(APIView):
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
 
     def get(self, request):
         try:
@@ -105,7 +108,7 @@ PATCH /file-upload/:
 - Returns validation errors with status 400 if invalid.
 """
 class FileUploadView(APIView):
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
 
     def patch(self, request, format=None):
         profile_id = request.data.get('id')
