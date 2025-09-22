@@ -1,3 +1,4 @@
+from auth_app.models import Account
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework import status
 from rest_framework.response import Response
@@ -57,7 +58,7 @@ Errors:
 - 500: Unexpected error during creation.
 """
 class OffersView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny]
     
     def get(self, request):
         try:
@@ -105,6 +106,9 @@ class OffersView(APIView):
             return Response({'error': f'Unexpected error: {str(e)}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     def post(self, request):
+        if request.user.user_type != Account.BUSINESS:
+            return Response({"detail": "Only business users are allowed to write offers."}, status=status.HTTP_403_FORBIDDEN)    
+
         serializer = OfferSerializer(data=request.data, context={'request': request})
         if serializer.is_valid():
             try:
@@ -112,7 +116,6 @@ class OffersView(APIView):
                 return Response(OfferSerializer(offer).data, status=status.HTTP_201_CREATED)
             except Exception as e:
                 import traceback
-                print(traceback.format_exc()) 
                 return Response({'detail': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

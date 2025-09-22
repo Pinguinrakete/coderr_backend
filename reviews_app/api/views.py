@@ -74,7 +74,6 @@ class ReviewsView(APIView):
         
         except Exception as e:
             import traceback
-            print(traceback.format_exc())
             return Response({'detail': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 """

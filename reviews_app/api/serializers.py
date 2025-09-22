@@ -40,9 +40,7 @@ class ReviewSerializer(serializers.ModelSerializer):
 
 
     def validate_business_user(self, value):          
-        allowed_ids = set(Account.objects.filter(business_user__isnull=False, user_type=Account.BUSINESS).values_list('business_user', flat=True))
-        print('allowed_ids', allowed_ids)
-        
+        allowed_ids = set(Account.objects.filter(business_user__isnull=False, user_type=Account.BUSINESS).values_list('business_user', flat=True))      
         if value not in allowed_ids:
             raise serializers.ValidationError(f"Die ID {value} ist kein erlaubter Business-Account.")
         

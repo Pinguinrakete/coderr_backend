@@ -39,6 +39,11 @@ class OfferSerializer(serializers.ModelSerializer):
         fields = ['id', 'title', 'image', 'description', 'details']
         read_only_fields = ['id']
 
+    def validate(self, data):
+        if 'details' in data and len(data['details']) < 3:
+            raise serializers.ValidationError({'details': 'At least 3 offer details are required.'})
+        return data
+
     def create(self, validated_data):
         details_data = validated_data.pop('details')
         user = self.context['request'].user
