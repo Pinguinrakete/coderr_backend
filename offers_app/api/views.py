@@ -115,7 +115,6 @@ class OffersView(APIView):
                 offer = serializer.save()
                 return Response(OfferSerializer(offer).data, status=status.HTTP_201_CREATED)
             except Exception as e:
-                import traceback
                 return Response({'detail': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -193,6 +192,9 @@ class OfferSingleView(APIView):
 
         serializer = OfferSinglePatchSerializer(offer, data=request.data, partial=True, context={'request': request})
         
+        if request.user.business_user != offer.business_user:
+            return Response({"detail": "Only the owner can update this Offer."}, status=status.HTTP_403_FORBIDDEN)  
+        
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
@@ -200,11 +202,12 @@ class OfferSingleView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def delete(self, request, id):
+        
         try:
             offer = Offer.objects.get(pk=id)
         except Offer.DoesNotExist:
             return Response({"detail": "Offer not found."}, status=status.HTTP_404_NOT_FOUND)
-
+        
         if request.user.id != offer.user_id:
             return Response({"detail": "Only the owner can delete this Offer."}, status=status.HTTP_403_FORBIDDEN)
 

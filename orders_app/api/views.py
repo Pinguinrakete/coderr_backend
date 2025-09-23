@@ -1,6 +1,5 @@
 from django.db.models import Q
 from orders_app.models import Order
-from .permissions import IsStaffUser
 from rest_framework.exceptions import NotFound
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework import status
@@ -32,21 +31,20 @@ Errors:
 - 500 on unexpected server errors with error detail.
 """
 class OrdersView(APIView):
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
     
     def get(self, request):      
         orders = Order.objects.filter(Q(customer_user=request.user.customer_user) | Q(business_user=request.user.business_user)).distinct()
         serializer = OrderSerializer(orders, many=True, context={'request': request})
         return Response(serializer.data)
     
-    def post(self, request, format=None):
+    def post(self, request):
         serializer = CreateOrderFromOfferSerializer(data=request.data, context={'request': request})
         if serializer.is_valid():
             try:
                 order = serializer.save()
                 return Response(OrderSerializer(order).data, status=status.HTTP_201_CREATED)
             except Exception as e:
-                import traceback
                 return Response({'detail': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -73,12 +71,7 @@ DELETE:
 - 404 if the order does not exist.
 """
 class OrderSingleView(APIView):
-    def get_permissions(self):
-        if self.request.method == 'PATCH':
-            return [IsAuthenticated()]
-        elif self.request.method == 'DELETE':
-            return [IsStaffUser()]
-        return super().get_permissions()
+    permission_classes = [IsAuthenticated]
 
     def patch(self, request, pk):
         try:
@@ -94,6 +87,9 @@ class OrderSingleView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
     def delete(self, request, pk):
+        if not request.user.is_staff:
+            return Response({"detail": "Only admin users can delete orders."}, status=status.HTTP_403_FORBIDDEN)
+        
         try:
             order = Order.objects.get(pk=pk)
         except Order.DoesNotExist:

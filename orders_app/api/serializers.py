@@ -45,7 +45,7 @@ class CreateOrderFromOfferSerializer(serializers.Serializer):
     def validate(self, data):
         user = self.context.get('request').user
         if user.user_type != Account.CUSTOMER:
-            raise serializers.ValidationError("Only customer users can create offers.")
+            raise serializers.ValidationError("Only customer users can create orders.")
         return data
 
     def create(self, validated_data):
@@ -94,10 +94,10 @@ class OrderSinglePatchSerializer(serializers.ModelSerializer):
 
     def validate(self, data):
         user = self.context.get('request').user
-        if user.user_type != Account.CUSTOMER:
-            raise serializers.ValidationError("Only customer users can update offers.")
+        if user.user_type != Account.BUSINESS:
+            raise serializers.ValidationError("Only business users can update orders.")
         return data
-    
+       
     def update(self, instance, validated_data):
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
