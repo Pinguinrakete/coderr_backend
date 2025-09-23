@@ -11,22 +11,16 @@ media/uploads/
 core/__pycache__/
 auth_app/__pycache__/
 auth_app/api/__pycache__/
-auth_app/migrations/
 profile_app/__pycache__/
 profile_app/api/__pycache__/
-profile_app/migrations/
 offers_app/__pycache__/
 offers_app/api/__pycache__/
-offers_app/migrations
 orders_app/__pycache__/
 orders_app/api/__pycache__/
-orders_app/migrations/
 reviews_app/__pycache__/
 reviews_app/api/__pycache__/
-reviews_app/migrations/
 base_info_app/__pycache__/
 base_info_app/api/__pycache__/
-base_info_app/migrations/
 
 # Python virtual environments
 env/
