@@ -2,7 +2,6 @@ from rest_framework import serializers
 from auth_app.models import Account
 from reviews_app.models import Review
 from rest_framework.exceptions import ValidationError
-from django.db.models import Q
 
 """
 Serializer for creating and retrieving reviews.
