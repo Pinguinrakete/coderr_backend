@@ -1,6 +1,7 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.db.models import Max
+from django.core.exceptions import ValidationError
 
 """
 Model representing a user account.
@@ -33,12 +34,16 @@ class Account(AbstractUser):
         (BUSINESS, 'Business'),
     ]
 
-    user_type = models.CharField(max_length=10, choices=USER_TYPE_CHOICES, default=CUSTOMER)
+    user_type = models.CharField(max_length=10, choices=USER_TYPE_CHOICES, null=True, blank=True)
     customer_user = models.PositiveIntegerField(null=True, blank=True, unique=True)
     business_user = models.PositiveIntegerField(null=True, blank=True, unique=True)
 
+    def clean(self):
+        if not self.is_superuser and not self.is_staff and not self.user_type:
+            raise ValidationError({'user_type': 'This field is required for regular users.'})
+        
     def save(self, *args, **kwargs):
-        if not self.is_superuser and not self.is_staff:
+        if not self.is_superuser and not self.is_staff and self.user_type:
             if not self.pk:
                 if self.user_type == self.CUSTOMER and self.customer_user is None:
                     max_id = Account.objects.filter(user_type=self.CUSTOMER).aggregate(Max('customer_user'))['customer_user__max'] or 0
