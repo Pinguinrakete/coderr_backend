@@ -17,9 +17,8 @@ The API serves as the foundation for seamless communication between the frontend
     • SQLite / PostgreSQL (optional)
 # ![Installation Icon](assets/icons/installation.png) Installation
 ## 1. Clone the repository:
-git clone https://github.com/Pinguinrakete/coderr_backend.git
+git clone https://github.com/Pinguinrakete/coderr_backend.git .
 ```bash
-cd coderr_backend
 ```
 ## 2. Create a virtual environment to isolate our package dependencies locally
 python -m venv env
