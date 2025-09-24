@@ -31,7 +31,7 @@ python -m venv env
 
 ### macOS/Linux
 ```bash
-source .\env\bin\activate
+source env\bin\activate
 ```  
 ## 3. Install dependencies  
 ```bash
@@ -42,7 +42,7 @@ pip install -r requirements.txt
 python manage.py migrate
 ```    
 ## Creates a superuser in Django   
-### an admin user with all permissions who can log into the Django admin interface  
+### An admin user with all permissions who can log into the Django admin interface  
 ```bash
 python manage.py createsuperuser
 ```   
