@@ -41,11 +41,11 @@ pip install -r requirements.txt
 ```bash
 python manage.py migrate
 ```    
-## Creates a superuser in Django – an admin user with all permissions who can log into the Django admin interface  
+## Creates a superuser in Django – ### an admin user with all permissions who can log into the Django admin interface  
 ```bash
 python manage.py createsuperuser
 ```   
-## Starts the local development server of Django. (by default at http://127.0.0.1:8000)  
+## Starts the local development server of Django. ### (by default at http://127.0.0.1:8000)  
 ```bash
 python manage.py runserver  
 ``` 
