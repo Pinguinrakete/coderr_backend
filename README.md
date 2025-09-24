@@ -17,28 +17,38 @@ The API serves as the foundation for seamless communication between the frontend
     • SQLite / PostgreSQL (optional)
 # ![Installation Icon](assets/icons/installation.png) Installation
 ## 1. Clone the repository:
-git clone https://github.com/Pinguinrakete/coderr_backend.git .
 ```bash
-```
+git clone https://github.com/Pinguinrakete/coderr_backend.git .
+```   
 ## 2. Create a virtual environment to isolate our package dependencies locally
+```bash
 python -m venv env
-
+``` 
 ### Windows
 ```bash
-source ".\env\Scripts\activate"
+.\env\Scripts\activate
 ```  
 
 ### macOS/Linux
 ```bash
-source ".\env\bin\activate"
+source .\env\bin\activate
 ```  
-## 3. Install dependencies
+## 3. Install dependencies  
+```bash
 pip install -r requirements.txt  
-
-python manage.py migrate  
-python manage.py createsuperuser  
+```  
+## Migrations are applied to the database.
+```bash
+python manage.py migrate
+```    
+## Creates a superuser in Django – an admin user with all permissions who can log into the Django admin interface  
+```bash
+python manage.py createsuperuser
+```   
+## Starts the local development server of Django. (by default at http://127.0.0.1:8000)  
+```bash
 python manage.py runserver  
-
+``` 
 # ![Authentication Icon](assets/icons/authentication.png) Authentication
 The API uses token-based authentication (TokenAuthentication). 
 Each API request must include a valid token in the HTTP header: 
