@@ -2,7 +2,7 @@ from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
-from .serializers import ProfileSingleSerializer, ProfileSinglePatchSerializer, ProfilesBusinessSerializer, ProfilesCustomerSerializer, FileUploadSerializer
+from .serializers import ProfileSingleSerializer, ProfileSinglePatchSerializer, ProfilesBusinessSerializer, ProfilesCustomerSerializer
 from profile_app.models import Profile
 
 """
@@ -92,37 +92,3 @@ class ProfilesCustomerView(APIView):
 
         serializer = ProfilesCustomerSerializer(profiles, many=True, context={'request': request})
         return Response(serializer.data, status=status.HTTP_200_OK)
-
-"""
-Handles partial updates for uploading files to a user's profile.
-
-Permissions:
-- AllowAny (no authentication required).
-
-PATCH /file-upload/:
-- Expects 'id' in request data representing the user’s profile ID.
-- Finds the profile linked to the given user ID.
-- Returns 400 if 'id' is missing.
-- Returns 404 if profile not found.
-- Partially updates the profile (e.g., uploads a file).
-- Returns validation errors with status 400 if invalid.
-"""
-class FileUploadView(APIView):
-    permission_classes = [IsAuthenticated]
-
-    def patch(self, request, format=None):
-        profile_id = request.data.get('id')
-        if not profile_id:
-            return Response({"detail": "Profil-ID not found."}, status=status.HTTP_400_BAD_REQUEST)
-
-        try:
-            profile = Profile.objects.get(user__pk=profile_id)
-        except Profile.DoesNotExist:
-            return Response({"detail": "Profile not found."}, status=status.HTTP_404_NOT_FOUND)
-
-        serializer = FileUploadSerializer(profile, data=request.data, partial=True)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

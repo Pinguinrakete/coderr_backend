@@ -35,20 +35,10 @@ class Account(AbstractUser):
     ]
 
     user_type = models.CharField(max_length=10, choices=USER_TYPE_CHOICES, null=True, blank=True)
-    customer_user = models.PositiveIntegerField(null=True, blank=True, unique=True)
-    business_user = models.PositiveIntegerField(null=True, blank=True, unique=True)
 
     def clean(self):
         if not self.is_superuser and not self.is_staff and not self.user_type:
             raise ValidationError({'user_type': 'This field is required for regular users.'})
         
     def save(self, *args, **kwargs):
-        if not self.is_superuser and not self.is_staff and self.user_type:
-            if not self.pk:
-                if self.user_type == self.CUSTOMER and self.customer_user is None:
-                    max_id = Account.objects.filter(user_type=self.CUSTOMER).aggregate(Max('customer_user'))['customer_user__max'] or 0
-                    self.customer_user = max_id + 1
-                elif self.user_type == self.BUSINESS and self.business_user is None:
-                    max_id = Account.objects.filter(user_type=self.BUSINESS).aggregate(Max('business_user'))['business_user__max'] or 0
-                    self.business_user = max_id + 1
         super().save(*args, **kwargs)

@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from profile_app.models import Profile
+import os
 
 """
 Serializes profile with related user info.
@@ -48,6 +49,16 @@ class ProfileSinglePatchSerializer(serializers.ModelSerializer):
         model = Profile
         fields = ['first_name', 'last_name', 'file', 'location', 'tel', 'description', 'working_hours', 'email']
 
+    def validate_file(self, value):
+        if value.size > 5 * 1024 * 1024:
+            raise serializers.ValidationError("The file must not be larger than 5 MB.")
+        return value
+    
+    def get_file(self, obj):
+        if obj.file:
+            return os.path.basename(obj.file.name)
+        return None
+    
     def update(self, instance, validated_data):
         user_data = validated_data.pop('user', {})
 
@@ -113,15 +124,3 @@ class ProfilesCustomerSerializer(serializers.ModelSerializer):
         if obj.file:
             return obj.file.url
         return None
-    
-"""
-Serializer for uploading a file to a user's profile.
-
-Fields:
-- file (FileField): The uploaded file.
-- uploaded_at (DateTimeField): Timestamp of the upload.
-"""
-class FileUploadSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Profile
-        fields = ['file', 'uploaded_at']
