@@ -7,24 +7,11 @@ from auth_app.models import Account
 from offers_app.models import Offer
 from reviews_app.models import Review
 
-"""
-Provides general platform statistics such as reviews, offers, and business profiles.
-
-Method: GET  
-Permissions: AllowAny (no authentication required)
-
-Returns:
-- review_count (int): Total number of submitted reviews.
-- average_rating (float): Average rating from all reviews. Returns 0 if no ratings exist.
-- business_profile_count (int): Number of registered business users.
-- offer_count (int): Total number of service offers posted.
-
-On error:
-- Returns a 500 Internal Server Error with a descriptive error message.
-"""
+"""Provides base statistics for the platform."""
 class BaseInfoView(APIView):
     permission_classes = [AllowAny]
        
+    # Return review, rating, business profile, and offer counts.
     def get(self, request):
         try:
             review_count = Review.objects.count()

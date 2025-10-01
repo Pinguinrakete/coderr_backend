@@ -9,57 +9,11 @@ from offers_app.models import Offer, OfferDetail
 from django.core.paginator import Paginator
 from .filters import apply_offer_filters, apply_offer_ordering
 
-"""
-Handles listing and creation of service offers.
-
-Permissions: 
-- Requires authentication (IsAuthenticated)
-
-Methods:
-
-GET:
-- Retrieves a paginated list of offers.
-- Supports filtering and sorting via query parameters.
-
-Query Parameters:
-- ordering (str, optional): Specifies the sorting field, e.g., `price`, `-created_at`, etc.
-- page (int, optional): Page number for pagination. Default: 1.
-- page_size (int, optional): Number of offers per page. Default: 6.
-- Additional custom filters may be supported depending on `apply_offer_filters`.
-
-Returns:
-- count (int): Total number of offers.
-- next (str or null): URL to the next page of results.
-- previous (str or null): URL to the previous page of results.
-- results (list): Serialized list of offers.
-
-Errors:
-- 400: Invalid filter, ordering, or pagination input.
-- 404: Page number out of valid range.
-- 500: Unexpected server error.
-
----
-
-POST:
-- Creates a new service offer.
-
-Accepts:
-- title (str): Title of the offer.
-- image (file, optional): Image representing the offer.
-- description (str, optional): Text description.
-- details (list): List of OfferDetail IDs or embedded detail data.
-- business_user (int): ID of the associated business user.
-
-Returns:
-- The created offer in serialized format on success.
-
-Errors:
-- 400: Validation errors in the submitted data.
-- 500: Unexpected error during creation.
-"""
+"""List or create offers."""
 class OffersView(APIView):
     permission_classes = [AllowAny]
     
+    # List offers with filtering, ordering, and pagination.
     def get(self, request):
         try:
             offers = Offer.objects.prefetch_related('details').select_related('user')
@@ -105,6 +59,7 @@ class OffersView(APIView):
         except Exception as e:
             return Response({'error': f'Unexpected error: {str(e)}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+    # Create a new offer (business users only).
     def post(self, request):
         if request.user.user_type != Account.BUSINESS:
             return Response({"detail": "Only business users are allowed to write offers."}, status=status.HTTP_403_FORBIDDEN)    
@@ -119,60 +74,12 @@ class OffersView(APIView):
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-"""
-Handles retrieval, partial update, and deletion of a single service offer.
 
-Permissions:
-- Requires authentication (IsAuthenticated)
-- Delete (and optionally update) restricted to the offer owner
-
-Methods:
-
-GET:
-- Retrieves the details of a single offer by its ID.
-- Includes related user and offer details in the response.
-
-Path Parameters:
-- id (int): Primary key of the offer to retrieve.
-
-Returns:
-- Serialized offer data with related details.
-- 200 on success.
-- 404 if the offer does not exist.
-- 500 on unexpected errors.
-
-PATCH:
-- Partially updates an existing offer.
-- Only authenticated users can perform this.
-- (Optionally) Only the offer owner should be allowed to update.
-
-Accepts:
-- Partial data to update fields of the offer.
-
-Path Parameters:
-- id (int): Primary key of the offer to update.
-
-Returns:
-- Serialized updated offer data on success.
-- 400 on validation errors.
-- 403 if the user is not the owner (if ownership check implemented).
-- 404 if the offer does not exist.
-
-DELETE:
-- Deletes an offer by its ID.
-- Only the offer owner is authorized to delete.
-
-Path Parameters:
-- id (int): Primary key of the offer to delete.
-
-Returns:
-- 204 No Content on successful deletion.
-- 403 if the user is not the owner.
-- 404 if the offer does not exist.
-"""
+"""Retrieve, update, or delete a single offer."""
 class OfferSingleView(APIView):
     permission_classes = [IsAuthenticated]
 
+    # Retrieve a single offer by ID.
     def get(self, request, id):
         try:
             offer = Offer.objects.prefetch_related('details').select_related('user').get(pk=id)
@@ -184,6 +91,7 @@ class OfferSingleView(APIView):
         except Exception as e:
             return Response({'error': f'Unexpected error: {str(e)}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+    # Update a single offer by ID (owner only).
     def patch(self, request, id):
         try:
             offer = Offer.objects.get(pk=id)
@@ -201,8 +109,8 @@ class OfferSingleView(APIView):
         
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+    # Delete a single offer by ID (owner only).
     def delete(self, request, id):
-        
         try:
             offer = Offer.objects.get(pk=id)
         except Offer.DoesNotExist:
@@ -214,28 +122,12 @@ class OfferSingleView(APIView):
         offer.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
     
-"""
-Handles retrieval of a single offer detail.
 
-Permissions:
-- Allows any user (authenticated or not) to access.
-
-Methods:
-
-GET:
-- Retrieves the details of a single offer detail by its ID.
-
-Path Parameters:
-- id (int): Primary key of the offer detail to retrieve.
-
-Returns:
-- Serialized offer detail data.
-- 200 on success.
-- 404 if the offer detail does not exist.
-"""
+"""Retrieve a single offer detail."""
 class OfferDetailView(APIView):
     permission_classes = [AllowAny]
     
+    # Get offer detail by ID.
     def get(self, request, id):
         try:
             offer_detail = OfferDetail.objects.get(pk=id)
@@ -245,34 +137,11 @@ class OfferDetailView(APIView):
         serializer = OfferDetailsSerializer(offer_detail, context={'request': request})
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-"""
-Handles partial updates to upload or update an image for an existing offer.
-
-Permissions:
-- Allows any user (authenticated or not) to access.
-
-Methods:
-
-PATCH:
-- Updates the image of a specified offer.
-
-Accepts:
-- id (int): ID of the offer to update.
-- image (file): The image file to upload or update.
-
-Request Data:
-- The `id` field is required to identify the offer.
-- Partial update is supported (only the image needs to be provided).
-
-Returns:
-- Serialized updated offer data including the new image on success.
-- 200 on successful update.
-- 400 if the `id` is missing or validation fails.
-- 404 if the offer with the given ID does not exist.
-"""
+"""Upload or update an offer image."""
 class ImageUploadView(APIView):
     permission_classes = [AllowAny]
 
+    # Update offer image by offer ID.
     def patch(self, request, format=None):
         offer_id = request.data.get('id')
         if not offer_id:

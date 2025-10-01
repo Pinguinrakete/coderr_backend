@@ -2,13 +2,7 @@ from rest_framework import serializers
 from profile_app.models import Profile
 import os
 
-"""
-Serializes profile with related user info.
-
-Fields: user ID, username, name, file URL, location, contact, description, user type, email, created date.
-
-All fields read-only.
-"""
+"""Serializer for retrieving a single user profile."""
 class ProfileSingleSerializer(serializers.ModelSerializer):
     user = serializers.IntegerField(source='user.id')
     username = serializers.CharField(source='user.username')
@@ -24,21 +18,13 @@ class ProfileSingleSerializer(serializers.ModelSerializer):
         fields = ['user', 'username', 'first_name', 'last_name', 'file','location', 'tel', 'description', 'working_hours', 'type', 'email', 'created_at']
         read_only_fields = fields
 
+    # Return file URL if present.
     def get_file(self, obj):
         if obj.file:
             return obj.file.url
         return None
 
-"""
-Serializer for partial updates to a user's profile and basic account data.
-
-Fields (all optional):
-- first_name, last_name, email (from user)
-- file, location, tel, description, working_hours (from profile)
-
-Updates:
-- Applies changes to both Profile and related User model.
-"""
+"""Serializer for updating a single user profile."""
 class ProfileSinglePatchSerializer(serializers.ModelSerializer):
     first_name = serializers.CharField(source='user.first_name', required=False)
     last_name = serializers.CharField(source='user.last_name', required=False)  
@@ -49,16 +35,19 @@ class ProfileSinglePatchSerializer(serializers.ModelSerializer):
         model = Profile
         fields = ['first_name', 'last_name', 'file', 'location', 'tel', 'description', 'working_hours', 'email']
 
+    # Validate uploaded file size.
     def validate_file(self, value):
         if value.size > 5 * 1024 * 1024:
             raise serializers.ValidationError("The file must not be larger than 5 MB.")
         return value
     
+    # Return file name if present.
     def get_file(self, obj):
         if obj.file:
             return os.path.basename(obj.file.name)
         return None
     
+    # Update profile and related user fields.
     def update(self, instance, validated_data):
         user_data = validated_data.pop('user', {})
 
@@ -73,14 +62,7 @@ class ProfileSinglePatchSerializer(serializers.ModelSerializer):
 
         return instance
 
-"""
-Serializes basic profile info for business users.
-
-Includes:
-- user ID, username, name, file URL, contact info, description, working hours, and user type.
-
-All fields are read-only.
-"""
+"""Serializer for listing business user profiles."""
 class ProfilesBusinessSerializer(serializers.ModelSerializer):
     user = serializers.IntegerField(source='user.id')
     username = serializers.CharField(source='user.username')
@@ -94,19 +76,13 @@ class ProfilesBusinessSerializer(serializers.ModelSerializer):
         fields = ['user', 'username', 'first_name', 'last_name', 'file', 'location', 'tel', 'description', 'working_hours', 'type']
         read_only_fields = fields
 
+    # Return file URL if present.
     def get_file(self, obj):
         if obj.file:
             return obj.file.url
         return None
 
-"""
-Serializes basic profile info for customer users.
-
-Includes:
-- user ID, username, name, file URL, upload time, and user type.
-
-All fields are read-only.
-"""
+"""Serializer for listing customer user profiles."""
 class ProfilesCustomerSerializer(serializers.ModelSerializer):
     user = serializers.IntegerField(source='user.id')
     username = serializers.CharField(source='user.username')
@@ -120,6 +96,7 @@ class ProfilesCustomerSerializer(serializers.ModelSerializer):
         fields = ['user', 'username', 'first_name', 'last_name', 'file', 'uploaded_at', 'type']
         read_only_fields = fields
 
+    # Return file URL if present.
     def get_file(self, obj):
         if obj.file:
             return obj.file.url

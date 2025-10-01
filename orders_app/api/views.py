@@ -7,35 +7,17 @@ from rest_framework.views import APIView
 from .serializers import OrderSerializer, CreateOrderFromOfferSerializer, OrderSinglePatchSerializer, OrderCountSerializer, CompletedOrderSerializer
 from auth_app.models import Account
 
-"""
-Handles listing and creation of orders.
-
-Permissions:
-- Allows any user (authenticated or not) to access.
-
-Methods:
-
-GET:
-- Retrieves orders where the requesting user is either the customer or business user.
-- Returns a serialized list of orders.
-
-POST:
-- Creates a new order from provided data.
-- Uses CreateOrderFromOfferSerializer for validation and creation.
-- Returns the created order data on success.
-
-Errors:
-- 400 on validation errors.
-- 500 on unexpected server errors with error detail.
-"""
+"""List or create orders for the authenticated user."""
 class OrdersView(APIView):
     permission_classes = [IsAuthenticated]
     
-    def get(self, request):      
+    # List all orders for the current user.
+    def get(self, request):
         orders = Order.objects.filter(Q(customer_user=request.user.customer_user) | Q(business_user=request.user.business_user)).distinct()
         serializer = OrderSerializer(orders, many=True, context={'request': request})
         return Response(serializer.data)
     
+    # Create a new order from an offer.
     def post(self, request):
         serializer = CreateOrderFromOfferSerializer(data=request.data, context={'request': request})
         if serializer.is_valid():
@@ -47,30 +29,11 @@ class OrdersView(APIView):
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-"""
-Handles partial update and deletion of a single order.
-
-Permissions:
-- PATCH: Requires authenticated user.
-- DELETE: Requires staff user.
-- Other methods: default permissions.
-
-Methods:
-
-PATCH:
-- Partially updates an order by its primary key.
-- Returns the updated order data on success.
-- 400 on validation errors.
-- 404 if the order does not exist.
-
-DELETE:
-- Deletes an order by its primary key.
-- 204 on successful deletion.
-- 404 if the order does not exist.
-"""
+"""Update or delete a single order."""
 class OrderSingleView(APIView):
     permission_classes = [IsAuthenticated]
 
+    # Update a single order by ID.
     def patch(self, request, pk):
         try:
             order = Order.objects.get(pk=pk)
@@ -84,6 +47,7 @@ class OrderSingleView(APIView):
         
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
+    # Delete a single order by ID (admin only).
     def delete(self, request, pk):
         if not request.user.is_staff:
             return Response({"detail": "Only admin users can delete orders."}, status=status.HTTP_403_FORBIDDEN)
@@ -96,24 +60,12 @@ class OrderSingleView(APIView):
         order.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
-"""
-Returns the count of in-progress orders for a specific business user.
-
-Permissions:
-- Requires authentication.
-
-GET:
-- Path parameter: business_user_id (int) — ID of the business user.
-- Checks if the business user exists.
-- Returns the count of orders with status 'in_progress' for the given business user.
-
-Errors:
-- 404 if the business user does not exist.
-"""
+"""Get count of in-progress orders for a business user."""
 class OrderCountView(APIView):
     permission_classes = [IsAuthenticated]
        
-    def get(self, request, business_user_id): 
+    # Return count of in-progress orders for a business user.
+    def get(self, request, business_user_id):
         try:
             Account.objects.get(business_user=business_user_id)
         except Account.DoesNotExist:
@@ -125,24 +77,12 @@ class OrderCountView(APIView):
 
         return Response(serializer.data)
     
-"""
-Returns the count of completed orders for a specific business user.
-
-Permissions:
-- Requires authentication.
-
-GET:
-- Path parameter: business_user_id (int) — ID of the business user.
-- Validates existence of the business user.
-- Returns the count of orders with status 'completed' for the specified business user.
-
-Errors:
-- 404 if the business user does not exist.
-"""
+"""Get count of completed orders for a business user."""
 class CompletedOrderCountView(APIView):
     permission_classes = [IsAuthenticated]
        
-    def get(self, request, business_user_id): 
+    # Return count of completed orders for a business user.
+    def get(self, request, business_user_id):
         try:
             Account.objects.get(business_user=business_user_id)
         except Account.DoesNotExist:

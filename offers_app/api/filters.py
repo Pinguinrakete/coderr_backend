@@ -1,5 +1,6 @@
 from django.db.models import Q
 
+# Apply filtering to offers queryset based on query parameters.
 def apply_offer_filters(queryset, params):
     creator_id = params.get('creator_id')
     if creator_id:
@@ -22,6 +23,7 @@ def apply_offer_filters(queryset, params):
     return queryset
 
 
+# Order offers queryset by updated_at or min_price.
 def apply_offer_ordering(queryset, ordering_param):
     if ordering_param:
         if ordering_param == 'updated_at':

@@ -6,16 +6,11 @@ from rest_framework.views import APIView
 from rest_framework import status
 from .serializers import RegistrationSerializer, LoginSerializer
 
-""" 
-This handles the user registration. 
-
-Method: POST
-Accepts: username, email, password, repeated password, type.
-Returns: saved_account data on success or validation errors.
-"""
+"""Handles user registration and token creation."""
 class RegistrationView(APIView):
     permission_classes = [AllowAny]
 
+    # Register a new user and return token.
     def post(self, request):
         serializer = RegistrationSerializer(data=request.data)
 
@@ -32,16 +27,11 @@ class RegistrationView(APIView):
               
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
-"""
-This handles the user login.
-
-Method: POST
-Accepts: username and password.
-Returns: user data on success or authentication error.
-"""
+"""Handles user login and token retrieval."""
 class LoginView(APIView):
     permission_classes = [AllowAny]
 
+    # Authenticate user and return token.
     def post(self, request):
         serializer = LoginSerializer(data=request.data)
         if serializer.is_valid():

@@ -5,25 +5,11 @@ from rest_framework import status
 from .serializers import ProfileSingleSerializer, ProfileSinglePatchSerializer, ProfilesBusinessSerializer, ProfilesCustomerSerializer
 from profile_app.models import Profile
 
-"""
-Handles retrieval and partial update of a user profile.
-
-Permissions:
-- AllowAny (no authentication required).
-
-GET /profiles/<pk>/:
-- Retrieves the profile linked to the user with primary key `pk`.
-- Returns 404 if profile not found.
-
-PATCH /profiles/<pk>/:
-- Partially updates the profile of the user with primary key `pk`.
-- Returns 404 if profile not found.
-- Validates and saves partial updates.
-- Returns validation errors with status 400 if invalid.
-"""
+"""Retrieve or update a single user profile."""
 class ProfileSingleView(APIView):
     permission_classes = [IsAuthenticated]
     
+    # Get a single profile by user ID.
     def get(self, request, pk):
         try:
             profile = Profile.objects.get(user__pk=pk)
@@ -33,6 +19,7 @@ class ProfileSingleView(APIView):
         serializer = ProfileSingleSerializer(profile, context={'request': request})
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+    # Update a single profile by user ID.
     def patch(self, request, pk):
         try:
             profile = Profile.objects.get(user__pk=pk)
@@ -49,19 +36,11 @@ class ProfileSingleView(APIView):
         
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-"""
-Handles retrieval of all business user profiles.
-
-Permissions:
-- AllowAny (no authentication required).
-
-GET /profiles/business/:
-- Returns a list of profiles where the linked user has user_type 'business'.
-- If no profiles found, returns 404 with a relevant message.
-"""
+"""List all business user profiles."""
 class ProfilesBusinessView(APIView):
     permission_classes = [IsAuthenticated]
 
+    # Get all business profiles.
     def get(self, request):
         try:
             profiles = Profile.objects.filter(user__user_type="business")
@@ -71,19 +50,12 @@ class ProfilesBusinessView(APIView):
         serializer = ProfilesBusinessSerializer(profiles, many=True, context={'request': request})
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-"""
-Handles retrieval of all customer user profiles.
 
-Permissions:
-- AllowAny (no authentication required).
-
-GET /profiles/customer/:
-- Returns a list of profiles where the linked user has user_type 'customer'.
-- If no profiles found, returns 404 with a relevant message.
-"""
+"""List all customer user profiles."""
 class ProfilesCustomerView(APIView):
     permission_classes = [IsAuthenticated]
 
+    # Get all customer profiles.
     def get(self, request):
         try:
             profiles = Profile.objects.filter(user__user_type="customer")

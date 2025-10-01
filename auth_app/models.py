@@ -1,29 +1,10 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
-from django.db.models import Max
 from django.core.exceptions import ValidationError
 
 """
-Model representing a user account.
-
-Inherits from:
-- AbstractUser: Provides default Django user fields like username, email, and password.
-
-Fields:
-- username (CharField): Inherited from AbstractUser. The unique username of the account.
-- email (EmailField): Inherited from AbstractUser. The user's email address.
-- password (CharField): Inherited from AbstractUser. The hashed user password.
-- user_type (CharField): Specifies the type of user.
-    Choices:
-        - "customer": Regular customer account.
-        - "business": Business account.
-    Default: "customer".
-- customer_user (PositiveIntegerField): Unique incremental ID for customer accounts. Auto-assigned on creation.
-- business_user (PositiveIntegerField): Unique incremental ID for business accounts. Auto-assigned on creation.
-
-Methods:
-- save(*args, **kwargs): Overrides the default save method to assign a sequential ID
-  to either customer_user or business_user depending on the user_type, if not already set.
+Custom user model extending Django's AbstractUser. Adds a user_type field to distinguish between customer and business users.
+Enforces user_type for regular users (not staff or superuser).
 """
 class Account(AbstractUser):
     CUSTOMER = 'customer'

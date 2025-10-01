@@ -4,13 +4,8 @@ from django.contrib.auth import authenticate
 from django.utils.translation import gettext_lazy as _
 from profile_app.models import Profile
 
-"""
-This handles user registration serializers.
 
-Method: POST  
-Accepts: username, email, password, repeated_password, type.  
-Returns: saved account data on success or validation errors.
-"""
+"""Serializer for user registration."""
 class RegistrationSerializer(serializers.ModelSerializer):
     repeated_password = serializers.CharField(write_only=True, required=True)
     type = serializers.ChoiceField(source='user_type', choices=Account.USER_TYPE_CHOICES, required=True)
@@ -19,6 +14,7 @@ class RegistrationSerializer(serializers.ModelSerializer):
         model = Account
         fields = ['username', 'email', 'password', 'repeated_password', 'type']
 
+    # Validate registration data.
     def validate(self, data):
         if data['password'] != data['repeated_password']:
             raise serializers.ValidationError({'password': 'Passwords do not match'})
@@ -31,6 +27,7 @@ class RegistrationSerializer(serializers.ModelSerializer):
 
         return data
 
+    # Create user and profile.
     def create(self, validated_data):
         validated_data.pop('repeated_password')
         user = Account.objects.create_user(**validated_data)
@@ -38,13 +35,8 @@ class RegistrationSerializer(serializers.ModelSerializer):
 
         return user
     
-""" 
-This serializer handles the user login process. 
 
-- Expects: username and password.
-- Authenticates user credentials.
-- Raises error if authentication fails.
-"""
+"""Serializer for user login."""
 class LoginSerializer(serializers.Serializer):
     username = serializers.CharField(write_only=True)
     password = serializers.CharField(write_only=True)
@@ -53,6 +45,7 @@ class LoginSerializer(serializers.Serializer):
         model = Account
         fields = ['username', 'password']
 
+    # Validate login credentials.
     def validate(self, data):
         username = data.get('username')
         password = data.get('password')

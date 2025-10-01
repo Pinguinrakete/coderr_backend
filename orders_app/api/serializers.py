@@ -3,38 +3,17 @@ from offers_app.models import Offer, OfferDetail
 from orders_app.models import Order
 from auth_app.models import Account
 
-"""
-Serializer for the Order model.
-
-Fields:
-- id, customer_user, business_user, title, revisions, delivery_time_in_days, price, features, offer_type, status, created_at, updated_at
-"""
+"""Serializer for order objects."""
 class OrderSerializer(serializers.ModelSerializer):
     class Meta:
         model = Order
         fields = ['id', 'customer_user','business_user', 'title', 'revisions', 'delivery_time_in_days', 'price', 'features', 'offer_type', 'status', 'created_at', 'updated_at']
 
-"""
-Serializer to create an Order from an OfferDetail.
-
-Fields:
-- offer_detail_id (int): ID of the OfferDetail to base the order on.
-
-Validation:
-- Checks that the OfferDetail with the given ID exists.
-- Ensures the requesting user is a customer (not business).
-
-Creation:
-- Finds the related Offer and OfferDetail.
-- Creates an Order using data from the Offer and OfferDetail.
-- Associates the order with the requesting customer user and the business user from the offer.
-
-Raises:
-- ValidationError if OfferDetail or Offer is not found or user is not a customer.
-"""
+"""Serializer for creating an order from an offer detail."""
 class CreateOrderFromOfferSerializer(serializers.Serializer):
     offer_detail_id = serializers.IntegerField()
 
+    # Validate that the offer detail exists.
     def validate_offer_detail_id(self, value):
         try:
             OfferDetail.objects.get(id=value)
@@ -42,12 +21,14 @@ class CreateOrderFromOfferSerializer(serializers.Serializer):
             raise serializers.ValidationError("OfferDetail with this ID does not exist.")
         return value
 
+    # Validate that only customers can create orders.
     def validate(self, data):
         user = self.context.get('request').user
         if user.user_type != Account.CUSTOMER:
             raise serializers.ValidationError("Only customer users can create orders.")
         return data
 
+    # Create an order from offer detail.
     def create(self, validated_data):
         order_detail_id = validated_data["offer_detail_id"]
         user = self.context['request'].user
@@ -73,31 +54,21 @@ class CreateOrderFromOfferSerializer(serializers.Serializer):
         )
         return order
 
-"""
-Serializer for partial updates of an Order's status.
-
-Fields:
-- status (writable)
-- Other fields are read-only.
-
-Validation:
-- Only users with user_type CUSTOMER can update.
-
-Update:
-- Applies validated fields to the instance and saves it.
-"""
+"""Serializer for updating order status."""
 class OrderSinglePatchSerializer(serializers.ModelSerializer):
     class Meta:
         model = Order
         fields = ['status']
         read_only_fields = ['id', 'customer_user','business_user', 'title', 'revisions', 'delivery_time_in_days', 'price', 'features', 'offer_type', 'created_at', 'updated_at']
 
+    # Validate that only business users can update orders.
     def validate(self, data):
         user = self.context.get('request').user
         if user.user_type != Account.BUSINESS:
             raise serializers.ValidationError("Only business users can update orders.")
         return data
        
+    # Update order instance with new data.
     def update(self, instance, validated_data):
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
@@ -105,21 +76,11 @@ class OrderSinglePatchSerializer(serializers.ModelSerializer):
         instance.save()
         return instance
 
-"""
-Serializer for returning the count of orders.
-
-Fields:
-- order_count (int): Number of orders.
-"""
+"""Serializer for returning order count."""
 class OrderCountSerializer(serializers.Serializer):
     order_count = serializers.IntegerField()
 
 
-"""
-Serializer for returning the count of completed orders.
-
-Fields:
-- completed_order_count (int): Number of completed orders.
-"""
+"""Serializer for returning completed order count."""
 class CompletedOrderSerializer(serializers.Serializer):
     completed_order_count = serializers.IntegerField()
