@@ -1,7 +1,9 @@
 from rest_framework import serializers
 from offers_app.models import Offer, OfferDetail
 from orders_app.models import Order
+from offers_app.models import Offer
 from auth_app.models import Account
+from rest_framework.exceptions import PermissionDenied
 
 """Serializer for order objects."""
 class OrderSerializer(serializers.ModelSerializer):
@@ -25,7 +27,7 @@ class CreateOrderFromOfferSerializer(serializers.Serializer):
     def validate(self, data):
         user = self.context.get('request').user
         if user.user_type != Account.CUSTOMER:
-            raise serializers.ValidationError("Only customer users can create orders.")
+            raise PermissionDenied("Only customer users can create orders.")
         return data
 
     # Create an order from offer detail.
@@ -42,9 +44,8 @@ class CreateOrderFromOfferSerializer(serializers.Serializer):
             raise serializers.ValidationError("OfferDetail not found in this offer.")
 
         order = Order.objects.create(
-            user=user,
-            customer_user=user.customer_user,
-            business_user=order.business_user,
+            customer_user=user,  
+            business_user=order.business_user,    
             title=order.title,
             revisions=order_detail.revisions,
             delivery_time_in_days=order_detail.delivery_time_in_days,

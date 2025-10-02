@@ -27,6 +27,12 @@ class OfferSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError({'details': 'At least 3 offer details are required.'})
         return data
 
+    # Return image URL if present.
+    def get_image(self, obj):
+        if obj.image:
+            return obj.image.url
+        return None
+
     # Create an offer with related details.
     def create(self, validated_data):
         details_data = validated_data.pop('details')
@@ -133,9 +139,3 @@ class OfferSinglePatchSerializer(serializers.ModelSerializer):
                 instance.details.add(detail_obj)
 
         return instance
-
-"""Serializer for uploading or updating offer images."""
-class ImageUploadSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Offer
-        fields = ['image', 'uploaded_at']

@@ -4,7 +4,7 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-from .serializers import OfferSerializer, OfferDetailsSerializer, OfferListSerializer, OfferListSingleSerializer, OfferSinglePatchSerializer, ImageUploadSerializer
+from .serializers import OfferSerializer, OfferDetailsSerializer, OfferListSerializer, OfferListSingleSerializer, OfferSinglePatchSerializer
 from offers_app.models import Offer, OfferDetail
 from django.core.paginator import Paginator
 from .filters import apply_offer_filters, apply_offer_ordering
@@ -136,25 +136,3 @@ class OfferDetailView(APIView):
         
         serializer = OfferDetailsSerializer(offer_detail, context={'request': request})
         return Response(serializer.data, status=status.HTTP_200_OK)
-
-"""Upload or update an offer image."""
-class ImageUploadView(APIView):
-    permission_classes = [AllowAny]
-
-    # Update offer image by offer ID.
-    def patch(self, request, format=None):
-        offer_id = request.data.get('id')
-        if not offer_id:
-            return Response({"detail": "Image ID not found."}, status=status.HTTP_400_BAD_REQUEST)
-
-        try:
-            offer = Offer.objects.get(pk=offer_id)
-        except Offer.DoesNotExist:
-            return Response({"detail": "Image not found."}, status=status.HTTP_404_NOT_FOUND)
-
-        serializer = ImageUploadSerializer(offer, data=request.data, partial=True)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

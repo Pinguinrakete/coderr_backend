@@ -13,7 +13,10 @@ class OrdersView(APIView):
     
     # List all orders for the current user.
     def get(self, request):
-        orders = Order.objects.filter(Q(customer_user=request.user.customer_user) | Q(business_user=request.user.business_user)).distinct()
+        user = request.user
+        
+        orders = Order.objects.filter(Q(customer_user=user) | Q(business_user=user)).distinct()
+        
         serializer = OrderSerializer(orders, many=True, context={'request': request})
         return Response(serializer.data)
     

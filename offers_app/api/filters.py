@@ -22,7 +22,6 @@ def apply_offer_filters(queryset, params):
 
     return queryset
 
-
 # Order offers queryset by updated_at or min_price.
 def apply_offer_ordering(queryset, ordering_param):
     if ordering_param:

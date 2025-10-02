@@ -1,6 +1,7 @@
 from django.db import models
 from auth_app.models import Account
 from offers_app.models import OfferType
+from offers_app.models import Offer
 
 """Choices for order status."""
 class StatusType(models.TextChoices):
@@ -11,8 +12,8 @@ class StatusType(models.TextChoices):
 """Model for an order placed by a user."""
 class Order(models.Model):   
     user = models.ForeignKey(Account, on_delete=models.CASCADE, related_name='orders')
-    customer_user = models.PositiveIntegerField(blank=False, null=True)
-    business_user = models.PositiveIntegerField(blank=False, null=True)
+    customer_user = models.ForeignKey(Account, on_delete=models.CASCADE, related_name='customer_orders', blank=False, null=True)
+    business_user = models.ForeignKey(Offer, on_delete=models.CASCADE, blank=False, null=True)
     title = models.CharField(max_length=255)
     revisions = models.PositiveIntegerField(default=0)
     delivery_time_in_days = models.PositiveIntegerField()
