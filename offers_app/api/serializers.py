@@ -126,6 +126,10 @@ class OfferSinglePatchSerializer(serializers.ModelSerializer):
     # Update offer and its related details.
     def update(self, instance, validated_data):
         details_data = validated_data.pop('details', None)
+        user = self.context['request'].user
+
+        if user.user_type != Account.BUSINESS:
+            raise serializers.ValidationError("Only business users can create offers.")
 
         for attr, value in validated_data.items():
             setattr(instance, attr, value)

@@ -23,20 +23,13 @@ class OfferDetail(models.Model):
        
 """Model for an offer created by a business user."""
 class Offer(models.Model):
-    user = models.ForeignKey(Account, on_delete=models.CASCADE, related_name='offers')
+    user = models.ForeignKey(Account, on_delete=models.CASCADE, related_name='offers', blank=False, editable=False)
     title = models.CharField(max_length=255)
     image = models.ImageField(upload_to='offer_images/', blank=True, null=True)
     description = models.TextField(blank=True, default="")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     details = models.ManyToManyField(OfferDetail, blank=True)
-    business_user = models.PositiveIntegerField(blank=False, editable=False)
 
-    # Save offer only if user is a business.
     def save(self, *args, **kwargs):
-        if self.user.user_type == Account.BUSINESS:
-            self.business_user = self.user.id
-        else:
-            raise ValidationError("Only business users are allowed to create offers.")
-        
         super().save(*args, **kwargs)

@@ -100,8 +100,8 @@ class OfferSingleView(APIView):
 
         serializer = OfferSinglePatchSerializer(offer, data=request.data, partial=True, context={'request': request})
         
-        if request.user.business_user != offer.business_user:
-            return Response({"detail": "Only the owner can update this Offer."}, status=status.HTTP_403_FORBIDDEN)  
+        if request.user.id != offer.user_id:
+            return Response({"detail": "Only the owner can delete this Offer."}, status=status.HTTP_403_FORBIDDEN) 
         
         if serializer.is_valid():
             serializer.save()
