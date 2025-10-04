@@ -10,6 +10,15 @@ class OfferDetailsSerializer(serializers.ModelSerializer):
     class Meta:
         model = OfferDetail
         fields = ['id', 'title', 'revisions', 'delivery_time_in_days', 'price', 'features', 'offer_type']
+    
+    # Format the price to an integer if it has no decimal part.
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        if data.get('price') is not None:
+            price = data['price']
+            if float(price).is_integer():
+                data['price'] = int(float(price))
+        return data
 
 """Serializer for creating and validating offers."""
 class OfferSerializer(serializers.ModelSerializer):
@@ -85,7 +94,7 @@ class OfferListSerializer(serializers.ModelSerializer):
     # Get minimum price from offer details.
     def get_min_price(self, obj):
         prices = obj.details.values_list('price', flat=True)
-        return min(prices) if prices else None
+        return int(min(prices)) if prices else None
 
     # Get minimum delivery time from offer details.
     def get_min_delivery_time(self, obj):
@@ -105,7 +114,7 @@ class OfferListSingleSerializer(serializers.ModelSerializer):
     # Get minimum price from offer details.
     def get_min_price(self, obj):
         prices = obj.details.values_list('price', flat=True)
-        return min(prices) if prices else None
+        return int(min(prices)) if prices else None
 
     # Get minimum delivery time from offer details.
     def get_min_delivery_time(self, obj):

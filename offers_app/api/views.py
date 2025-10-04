@@ -125,7 +125,7 @@ class OfferSingleView(APIView):
 
 """Retrieve a single offer detail."""
 class OfferDetailView(APIView):
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
     
     # Get offer detail by ID.
     def get(self, request, id):

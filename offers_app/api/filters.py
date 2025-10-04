@@ -7,12 +7,20 @@ def apply_offer_filters(queryset, params):
         queryset = queryset.filter(user_id=creator_id)
 
     min_price = params.get('min_price')
-    if min_price:
-        queryset = queryset.filter(details__price__gte=min_price)
+    if min_price is not None:
+        try:
+            min_price = float(min_price)
+            queryset = queryset.filter(details__price__gte=min_price)
+        except ValueError:
+            raise ValueError("Invalid value for min_price. Must be a number.")
 
     max_delivery_time = params.get('max_delivery_time')
-    if max_delivery_time:
-        queryset = queryset.filter(details__delivery_time_in_days__lte=max_delivery_time)
+    if max_delivery_time is not None:
+        try:
+            max_delivery_time = int(max_delivery_time)  
+            queryset = queryset.filter(details__delivery_time_in_days__lte=max_delivery_time)
+        except ValueError:
+            raise ValueError("Invalid value for max_delivery_time. Must be an integer.")
 
     search = params.get('search')
     if search:
