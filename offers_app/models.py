@@ -1,6 +1,5 @@
 from django.db import models
 from auth_app.models import Account
-from rest_framework.exceptions import ValidationError
 
 """Choices for offer types."""
 class OfferType(models.TextChoices):
@@ -13,7 +12,7 @@ class OfferDetail(models.Model):
     title = models.CharField(max_length=255)
     revisions = models.PositiveIntegerField(default=0)
     delivery_time_in_days = models.PositiveIntegerField()
-    price = models.DecimalField(max_digits=10, decimal_places=2, blank=False, null=True)
+    price = models.DecimalField(max_digits=15, decimal_places=2, blank=False, null=True)
     features = models.JSONField(default=list, blank=True)
     offer_type = models.CharField(max_length=10, choices=OfferType.choices, default=OfferType.STANDARD)
 

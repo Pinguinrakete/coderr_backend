@@ -11,13 +11,12 @@ class StatusType(models.TextChoices):
 
 """Model for an order placed by a user."""
 class Order(models.Model):   
-    user = models.ForeignKey(Account, on_delete=models.CASCADE, related_name='orders')
     customer_user = models.ForeignKey(Account, on_delete=models.CASCADE, related_name='customer_orders', blank=False, null=True)
-    business_user = models.ForeignKey(Offer, on_delete=models.CASCADE, blank=False, null=True)
+    business_user = models.ForeignKey(Offer, on_delete=models.CASCADE, related_name='offerer', blank=False, null=True)
     title = models.CharField(max_length=255)
     revisions = models.PositiveIntegerField(default=0)
     delivery_time_in_days = models.PositiveIntegerField()
-    price = models.DecimalField(max_digits=10, decimal_places=2, blank=False, null=True)
+    price = models.DecimalField(max_digits=15, decimal_places=2, blank=False, null=True)
     features = models.JSONField(default=list, blank=True)
     offer_type = models.CharField(max_length=10, choices=OfferType.choices, default=OfferType.STANDARD)
     status = models.CharField(max_length=12, choices=StatusType.choices, default=StatusType.IN_PROGRESS)
