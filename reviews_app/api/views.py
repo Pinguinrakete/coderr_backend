@@ -38,10 +38,6 @@ class ReviewsView(APIView):
         
     # Create a new review (customer users only).
     def post(self, request):
-        if request.user.user_type != Account.CUSTOMER:
-            return Response(
-                {"detail": "Only customer users are allowed to write reviews."}, status=status.HTTP_403_FORBIDDEN)    
-
         serializer = ReviewSerializer(data=request.data, context={'request': request})
         try:
             if serializer.is_valid(raise_exception=True):
