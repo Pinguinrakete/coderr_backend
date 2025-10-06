@@ -11,30 +11,36 @@ class OrderSerializer(serializers.ModelSerializer):
         model = Order
         fields = ['id', 'customer_user','business_user', 'title', 'revisions', 'delivery_time_in_days', 'price', 'features', 'offer_type', 'status', 'created_at', 'updated_at']
 
+    # Format the price as a number (int if no decimals, else float).
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        price = data.get('price')
+        if price is not None:
+            if float(price).is_integer():
+                data['price'] = int(float(price))
+            else:
+                data['price'] = float(price)
+        return data
+    
 """Serializer for creating an order from an offer detail."""
 class CreateOrderFromOfferSerializer(serializers.Serializer):
     offer_detail_id = serializers.IntegerField()
 
-    # Validate that the offer detail exists.
     def validate_offer_detail_id(self, value):
-        try:
-            OfferDetail.objects.get(id=value)
-        except OfferDetail.DoesNotExist:
+        if not OfferDetail.objects.filter(id=value).exists():
             raise serializers.ValidationError("OfferDetail with this ID does not exist.")
         return value
 
-    # Validate that only customers can create orders.
     def validate(self, data):
         user = self.context.get('request').user
         if user.user_type != Account.CUSTOMER:
             raise PermissionDenied("Only customer users can create orders.")
         return data
 
-    # Create an order from offer detail.
     def create(self, validated_data):
         offer_detail_id = validated_data["offer_detail_id"]
         user = self.context['request'].user
-       
+
         offer = Offer.objects.filter(details__id=offer_detail_id).first()
         if not offer:
             raise serializers.ValidationError("No offer found for this OfferDetail.")
@@ -42,7 +48,7 @@ class CreateOrderFromOfferSerializer(serializers.Serializer):
         offer_detail = offer.details.filter(id=offer_detail_id).first()
         if not offer_detail:
             raise serializers.ValidationError("OfferDetail not found in this offer.")
-
+        
         order = Order.objects.create(
             customer_user=user,  
             business_user=offer,    
