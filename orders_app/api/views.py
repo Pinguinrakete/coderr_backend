@@ -13,8 +13,7 @@ class OrdersView(APIView):
     
     # List all orders for the current user.
     def get(self, request):
-        user = request.user
-        print('eingeloggter  User:', user)
+        user = request.user.id
         orders = Order.objects.filter(Q(customer_user=user) | Q(business_user=user)).distinct()
         
         serializer = OrderSerializer(orders, many=True, context={'request': request})
@@ -70,11 +69,10 @@ class OrderCountView(APIView):
     # Return count of in-progress orders for a business user.
     def get(self, request, business_user_id):
         try:
-            Account.objects.get(business_user=business_user_id)
-        except Account.DoesNotExist:
-            return Response({"detail": "A business user with this ID does not exist."}, status=status.HTTP_404_NOT_FOUND)
-
-        orders = Order.objects.filter(Q(business_user=business_user_id) & Q(status="in_progress")).distinct()
+            orders = Order.objects.filter(Q(business_user_id=business_user_id) & Q(status="in_progress")).distinct()
+        except Order.DoesNotExist:
+            return Response({"detail": "404: No business user found with the specified ID."}, status=status.HTTP_404_NOT_FOUND
+            )
         count_in_progress = len(orders)
         serializer = OrderCountSerializer({'order_count': count_in_progress}, context={'request': request})
 
