@@ -16,7 +16,7 @@ class BaseInfoView(APIView):
         try:
             review_count = Review.objects.count()
             rating_list = Review.objects.values_list('rating', flat=True)
-            business_user_count = Account.objects.exclude(business_user=None).count()
+            business_user_count = Account.objects.filter(user_type=Account.BUSINESS).count()
             offer_count = Offer.objects.count() 
 
             average_rating = sum(rating_list) / len(rating_list) if rating_list else 0
