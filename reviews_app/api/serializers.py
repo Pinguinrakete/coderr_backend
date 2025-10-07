@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from auth_app.models import Account
 from reviews_app.models import Review
-from rest_framework.exceptions import ValidationError
+from rest_framework.exceptions import PermissionDenied, ValidationError
 
 """Serializer for creating and validating reviews."""
 class ReviewSerializer(serializers.ModelSerializer):
@@ -18,12 +18,12 @@ class ReviewSerializer(serializers.ModelSerializer):
         user = self.context['request'].user
         
         if user.user_type != Account.CUSTOMER:
-            raise ValidationError("Only authenticated users with a customer profile are allowed to submit reviews.")
+            raise PermissionDenied("Only authenticated users with a customer profile are allowed to submit reviews.")
         
         business_user_id = attrs.get('business_user', None)
 
         if Review.objects.filter(reviewer=user, business_user=business_user_id).exists():
-            raise ValidationError("You have already reviewed this business profile.")
+            raise PermissionDenied("You have already reviewed this business profile.")
         return attrs
 
     # Validate that business_user is a valid business account.        
@@ -35,7 +35,6 @@ class ReviewSerializer(serializers.ModelSerializer):
     # Set reviewer to the current user.
     def create(self, validated_data):
         validated_data['reviewer'] = self.context['request'].user
-        print("validated_data in create:", validated_data)
 
         return super().create(validated_data)
 

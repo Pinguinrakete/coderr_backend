@@ -1,6 +1,6 @@
 from auth_app.models import Account
 from rest_framework import status
-from rest_framework.exceptions import ValidationError
+from rest_framework.exceptions import ValidationError, PermissionDenied
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -43,8 +43,12 @@ class ReviewsView(APIView):
             if serializer.is_valid(raise_exception=True):
                 review = serializer.save()
                 return Response(ReviewSerializer(review).data, status=status.HTTP_201_CREATED)
+            
         except ValidationError as e:
             return Response(e.detail, status=status.HTTP_400_BAD_REQUEST)
+        
+        except PermissionDenied as e:
+            return Response({'detail': str(e)}, status=status.HTTP_403_FORBIDDEN)
         
         except Exception as e:
             return Response({'detail': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -58,7 +62,7 @@ class ReviewSingleView(APIView):
         try:
             review = Review.objects.get(pk=id)
         except Review.DoesNotExist:
-            return Response({"detail": "Review not found."}, status=status.HTTP_404_NOT_FOUND)
+            return Response({"detail": f"Review with ID {id} not found."}, status=status.HTTP_404_NOT_FOUND)
 
         if request.user.id != review.reviewer_id:
             return Response({"detail": "Only the reviewer can update this review."}, status=status.HTTP_403_FORBIDDEN)     
