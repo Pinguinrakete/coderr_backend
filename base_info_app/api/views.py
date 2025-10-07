@@ -19,7 +19,7 @@ class BaseInfoView(APIView):
             business_user_count = Account.objects.filter(user_type=Account.BUSINESS).count()
             offer_count = Offer.objects.count() 
 
-            average_rating = sum(rating_list) / len(rating_list) if rating_list else 0
+            average_rating = sum(rating_list) / len(rating_list) if rating_list else 0.0
 
             serializer = BaseInfoSerializer(
                     {
