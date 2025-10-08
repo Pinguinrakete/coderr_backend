@@ -5,6 +5,7 @@ from rest_framework.reverse import reverse
 
 """Serializer for offer detail objects."""
 class OfferDetailsSerializer(serializers.ModelSerializer):
+    id = serializers.IntegerField(required=False)
     features = serializers.ListField(child=serializers.CharField(max_length=255), required=False, default=list)
     
     class Meta:
@@ -148,7 +149,19 @@ class OfferSinglePatchSerializer(serializers.ModelSerializer):
             instance.details.clear()
 
             for detail_data in details_data:
-                detail_obj, _ = OfferDetail.objects.get_or_create(**detail_data)
+                detail_id = detail_data.get('id', None)
+
+                if detail_id:
+                    try:
+                        detail_obj = OfferDetail.objects.get(id=detail_id)
+                        for attr, value in detail_data.items():
+                            setattr(detail_obj, attr, value)
+                        detail_obj.save()
+                    except OfferDetail.DoesNotExist:
+                        detail_obj = OfferDetail.objects.create(**detail_data)
+                else:
+                    detail_obj = OfferDetail.objects.create(**detail_data)
+
                 instance.details.add(detail_obj)
 
         return instance
