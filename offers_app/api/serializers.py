@@ -146,22 +146,33 @@ class OfferSinglePatchSerializer(serializers.ModelSerializer):
         instance.save()
 
         if details_data is not None:
-            instance.details.clear()
+            existing_detail_ids = {detail.id for detail in instance.details.all()}
+            submitted_detail_ids = set()
 
             for detail_data in details_data:
-                detail_id = detail_data.get('id', None)
+                detail_id = detail_data.get('id')
 
                 if detail_id:
                     try:
                         detail_obj = OfferDetail.objects.get(id=detail_id)
+                        if detail_obj.id not in existing_detail_ids:
+                            return serializers.ValidationError(f"OfferDetail with id {detail_id} does not belong to this offer.")
+
                         for attr, value in detail_data.items():
                             setattr(detail_obj, attr, value)
                         detail_obj.save()
+
+                        submitted_detail_ids.add(detail_obj.id)
+
                     except OfferDetail.DoesNotExist:
-                        detail_obj = OfferDetail.objects.create(**detail_data)
+                        raise serializers.ValidationError(f"OfferDetail with id {detail_id} not found.")
                 else:
                     detail_obj = OfferDetail.objects.create(**detail_data)
+                    instance.details.add(detail_obj)
+                    submitted_detail_ids.add(detail_obj.id)
 
-                instance.details.add(detail_obj)
+            to_remove = existing_detail_ids - submitted_detail_ids
+            if to_remove:
+                instance.details.remove(*to_remove)
 
         return instance
