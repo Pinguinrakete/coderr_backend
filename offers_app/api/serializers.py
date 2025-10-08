@@ -129,8 +129,8 @@ class OfferSinglePatchSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Offer
-        fields = ['title', 'image', 'description', 'details']
-        read_only_fields = ['user']
+        fields = ['id', 'title', 'image', 'description', 'details']
+        read_only_fields = ['id', 'user']
 
     # Update offer and its related details.
     def update(self, instance, validated_data):
