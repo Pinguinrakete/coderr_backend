@@ -11,8 +11,8 @@ class StatusType(models.TextChoices):
 
 """Model for an order placed by a user."""
 class Order(models.Model):   
-    customer_user = models.ForeignKey(Account, on_delete=models.CASCADE, related_name='customer_orders', blank=False, null=True)
-    business_user = models.ForeignKey(Offer, on_delete=models.CASCADE, related_name='offerer', blank=False, null=True)
+    customer_user = models.ForeignKey(Account, on_delete=models.CASCADE, related_name='customer_orders', blank=False)
+    business_user = models.ForeignKey(Account, on_delete=models.CASCADE, related_name='business_orders', blank=False)
     title = models.CharField(max_length=255)
     revisions = models.PositiveIntegerField(default=0)
     delivery_time_in_days = models.PositiveIntegerField()
