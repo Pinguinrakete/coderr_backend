@@ -1,4 +1,3 @@
-# from auth_app.models import Account
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework import status
 from rest_framework.response import Response
@@ -70,9 +69,6 @@ class OffersView(APIView):
 
     # Create a new offer (business users only).
     def post(self, request):
-        # if request.user.user_type != Account.BUSINESS:
-        #     return Response({"detail": "Only business users are allowed to write offers."}, status=status.HTTP_403_FORBIDDEN)    
-
         serializer = OfferSerializer(data=request.data, context={'request': request})
         if serializer.is_valid():
             try:
