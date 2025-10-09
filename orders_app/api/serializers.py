@@ -72,7 +72,7 @@ class OrderSinglePatchSerializer(serializers.ModelSerializer):
     def validate(self, data):
         user = self.context.get('request').user
         if user.user_type != Account.BUSINESS:
-            raise serializers.ValidationError("Only business users can update orders.")
+            raise PermissionDenied("Only business users can update orders.")
         return data
        
     # Update order instance with new data.
