@@ -1,4 +1,4 @@
-from auth_app.models import Account
+# from auth_app.models import Account
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework import status
 from rest_framework.response import Response
@@ -8,11 +8,20 @@ from .serializers import OfferSerializer, OfferDetailsSerializer, OfferListSeria
 from offers_app.models import Offer, OfferDetail
 from django.core.paginator import Paginator
 from .filters import apply_offer_filters, apply_offer_ordering
+from .permissions import IsBusinessUser
 
 """List or create offers."""
 class OffersView(APIView):
     permission_classes = [AllowAny]
-    
+
+    # Permission for get and post
+    def get_permissions(self):
+        if self.request.method == 'GET':
+            return [AllowAny()]
+        elif self.request.method == 'POST':
+            return [IsAuthenticated(), IsBusinessUser()]
+        return super().get_permissions()    
+
     # List offers with filtering, ordering, and pagination.
     def get(self, request):
         try:
@@ -61,8 +70,8 @@ class OffersView(APIView):
 
     # Create a new offer (business users only).
     def post(self, request):
-        if request.user.user_type != Account.BUSINESS:
-            return Response({"detail": "Only business users are allowed to write offers."}, status=status.HTTP_403_FORBIDDEN)    
+        # if request.user.user_type != Account.BUSINESS:
+        #     return Response({"detail": "Only business users are allowed to write offers."}, status=status.HTTP_403_FORBIDDEN)    
 
         serializer = OfferSerializer(data=request.data, context={'request': request})
         if serializer.is_valid():
