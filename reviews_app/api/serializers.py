@@ -23,7 +23,7 @@ class ReviewSerializer(serializers.ModelSerializer):
         business_user_id = attrs.get('business_user', None)
 
         if Review.objects.filter(reviewer=user, business_user=business_user_id).exists():
-            raise PermissionDenied("You have already reviewed this business profile.")
+            raise serializers.ValidationError("You have already reviewed this business profile.")
         return attrs
 
     # Validate that business_user is a valid business account.        
