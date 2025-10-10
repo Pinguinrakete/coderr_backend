@@ -141,13 +141,13 @@ class OfferSinglePatchSerializer(serializers.ModelSerializer):
         if user.user_type != Account.BUSINESS:
             raise serializers.ValidationError("Only business users can create offers.")
 
+        # Update main offer fields
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
         instance.save()
 
         if details_data is not None:
             existing_detail_ids = {detail.id for detail in instance.details.all()}
-            submitted_detail_ids = set()
 
             for detail_data in details_data:
                 detail_id = detail_data.get('id')
@@ -156,23 +156,30 @@ class OfferSinglePatchSerializer(serializers.ModelSerializer):
                     try:
                         detail_obj = OfferDetail.objects.get(id=detail_id)
                         if detail_obj.id not in existing_detail_ids:
-                            return serializers.ValidationError(f"OfferDetail with id {detail_id} does not belong to this offer.")
+                            raise serializers.ValidationError(
+                                f"OfferDetail with id {detail_id} does not belong to this offer."
+                            )
 
                         for attr, value in detail_data.items():
                             setattr(detail_obj, attr, value)
                         detail_obj.save()
 
-                        submitted_detail_ids.add(detail_obj.id)
-
                     except OfferDetail.DoesNotExist:
-                        raise serializers.ValidationError(f"OfferDetail with id {detail_id} not found.")
+                        raise serializers.ValidationError(
+                            f"OfferDetail with id {detail_id} not found."
+                        )
                 else:
                     detail_obj = OfferDetail.objects.create(**detail_data)
                     instance.details.add(detail_obj)
-                    submitted_detail_ids.add(detail_obj.id)
-
-            to_remove = existing_detail_ids - submitted_detail_ids
-            if to_remove:
-                instance.details.remove(*to_remove)
 
         return instance
+
+"""The serializer's response includes the update offer and its details."""
+class OfferSinglePatchResponseSerializer(serializers.ModelSerializer):
+    details = OfferDetailsSerializer(many=True, read_only=True)
+    image = serializers.ImageField(required=False, allow_null=True)
+
+    class Meta:
+        model = Offer
+        fields = ['id', 'title', 'image', 'description', 'details']
+        read_only_fields = ['id', 'details']

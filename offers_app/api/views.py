@@ -3,7 +3,7 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-from .serializers import OfferSerializer, OfferDetailsSerializer, OfferListSerializer, OfferListSingleSerializer, OfferSinglePatchSerializer
+from .serializers import OfferSerializer, OfferDetailsSerializer, OfferListSerializer, OfferListSingleSerializer, OfferSinglePatchSerializer, OfferSinglePatchResponseSerializer
 from offers_app.models import Offer, OfferDetail
 from django.core.paginator import Paginator
 from .filters import apply_offer_filters, apply_offer_ordering
@@ -103,15 +103,17 @@ class OfferSingleView(APIView):
         except Offer.DoesNotExist:
             return Response({"detail": "Offer not found."}, status=status.HTTP_404_NOT_FOUND)
 
-        serializer = OfferSinglePatchSerializer(offer, data=request.data, partial=True, context={'request': request})
-        
         if request.user.id != offer.user_id:
-            return Response({"detail": "Only the owner can delete this Offer."}, status=status.HTTP_403_FORBIDDEN) 
-        
+            return Response({"detail": "Only the owner can update this Offer."}, status=status.HTTP_403_FORBIDDEN)
+
+        serializer = OfferSinglePatchSerializer(offer, data=request.data, partial=True, context={'request': request})
+
         if serializer.is_valid():
             serializer.save()
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        
+
+            response_serializer = OfferSinglePatchResponseSerializer(offer, context={'request': request})
+            return Response(response_serializer.data, status=status.HTTP_200_OK)
+
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     # Delete a single offer by ID (owner only).
