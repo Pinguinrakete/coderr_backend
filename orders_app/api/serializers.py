@@ -26,17 +26,20 @@ class OrderSerializer(serializers.ModelSerializer):
 class CreateOrderFromOfferSerializer(serializers.Serializer):
     offer_detail_id = serializers.IntegerField()
 
+    # Ensure the provided OfferDetail ID exists in the database.
     def validate_offer_detail_id(self, value):
         if not OfferDetail.objects.filter(id=value).exists():
             raise serializers.ValidationError("OfferDetail with this ID does not exist.")
         return value
 
+    # Validate the user's permission: only customers can create orders.
     def validate(self, data):
         user = self.context.get('request').user
         if user.user_type != Account.CUSTOMER:
             raise PermissionDenied("Only customer users can create orders.")
         return data
 
+    # Create an Order instance based on the given OfferDetail.
     def create(self, validated_data):
         offer_detail_id = validated_data["offer_detail_id"]
         user = self.context['request'].user
