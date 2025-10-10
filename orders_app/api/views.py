@@ -1,10 +1,11 @@
+from auth_app.models import Account
 from django.db.models import Q
 from orders_app.models import Order
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
-from rest_framework.exceptions import NotFound
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from django.shortcuts import get_object_or_404
 from .serializers import OrderSerializer, CreateOrderFromOfferSerializer, OrderSinglePatchSerializer, OrderCountSerializer, CompletedOrderSerializer
 
 """List or create orders for the authenticated user."""
@@ -68,11 +69,13 @@ class OrderCountView(APIView):
        
     # Return count of in-progress orders for a business user.
     def get(self, request, business_user_id):
-        orders = Order.objects.filter(Q(business_user_id=business_user_id) & Q(status="in_progress")).distinct()
-        if not orders.exists():
-            raise NotFound("404: No completed orders found for the specified business user ID.")
+        business_user = get_object_or_404(Account, id=business_user_id)
         
-        count_in_progress = len(orders)
+        if business_user.user_type != Account.BUSINESS:
+            return Response({"detail": "This user is not a business user."}, status=status.HTTP_404_NOT_FOUND)
+
+        orders = Order.objects.filter(Q(business_user_id=business_user_id) & Q(status="in_progress")).distinct()
+        count_in_progress = orders.count()
         serializer = OrderCountSerializer({'order_count': count_in_progress}, context={'request': request})
 
         return Response(serializer.data)
@@ -83,11 +86,13 @@ class CompletedOrderCountView(APIView):
        
     # Return count of completed orders for a business user.
     def get(self, request, business_user_id):
-        orders = Order.objects.filter(Q(business_user_id=business_user_id) & Q(status="completed")).distinct()
-        if not orders.exists():
-            raise NotFound("404: No completed orders found for the specified business user ID.")
+        business_user = get_object_or_404(Account, id=business_user_id)
 
-        count_completed = len(orders)
+        if business_user.user_type != Account.BUSINESS:
+            return Response({"detail": "This user is not a business user."}, status=status.HTTP_404_NOT_FOUND)
+
+        orders = Order.objects.filter(Q(business_user_id=business_user_id) & Q(status="completed")).distinct()
+        count_completed = orders.count()
         serializer = CompletedOrderSerializer({'completed_order_count': count_completed}, context={'request': request})
 
         return Response(serializer.data)
