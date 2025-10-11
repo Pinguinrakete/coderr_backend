@@ -135,9 +135,10 @@ class OfferSinglePatchSerializer(serializers.ModelSerializer):
 
     # The validate_details function checks a list of detail dictionaries to ensure that each one contains both an 'id' and an 'offer_type' key
     def validate_details(self, value):
+        offer_types = [item.get('offer_type') for item in value]
+        if len(set(offer_types)) != len(offer_types):
+            raise serializers.ValidationError("Duplicate offer_type values are not allowed.")
         for detail in value:
-            if 'id' not in detail:
-                raise serializers.ValidationError("Each detail must include its 'id' when updating.")
             if 'offer_type' not in detail:
                 raise serializers.ValidationError("Each detail must include its 'offer_type'.")
         return value
@@ -155,23 +156,23 @@ class OfferSinglePatchSerializer(serializers.ModelSerializer):
             setattr(instance, attr, value)
         instance.save()
 
+        # Handle detail updates based on offer_type
         if details_data is not None:
-            existing_detail_ids = {detail.id for detail in instance.details.all()}
+            details_by_type = {detail.offer_type: detail for detail in instance.details.all()}
 
             for detail_data in details_data:
-                detail_id = detail_data.get('id')
+                offer_type = detail_data.get('offer_type')
 
-                if detail_id not in existing_detail_ids:
+                if offer_type not in details_by_type:
                     raise serializers.ValidationError(
-                        f"OfferDetail with id {detail_id} does not belong to this offer.")
+                        f"OfferDetail with offer_type '{offer_type}' does not belong to this offer."
+                    )
 
-                try:
-                    detail_obj = OfferDetail.objects.get(id=detail_id)
-                except OfferDetail.DoesNotExist:
-                    raise serializers.ValidationError(f"OfferDetail with id {detail_id} not found.")
+                detail_obj = details_by_type[offer_type]
 
                 for attr, value in detail_data.items():
-                    setattr(detail_obj, attr, value)
+                    if attr != 'offer_type':  
+                        setattr(detail_obj, attr, value)
                 detail_obj.save()
 
         return instance
