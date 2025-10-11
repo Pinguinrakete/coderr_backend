@@ -133,6 +133,15 @@ class OfferSinglePatchSerializer(serializers.ModelSerializer):
         fields = ['id', 'title', 'image', 'description', 'details']
         read_only_fields = ['id', 'user']
 
+    # The validate_details function checks a list of detail dictionaries to ensure that each one contains both an 'id' and an 'offer_type' key
+    def validate_details(self, value):
+        for detail in value:
+            if 'id' not in detail:
+                raise serializers.ValidationError("Each detail must include its 'id' when updating.")
+            if 'offer_type' not in detail:
+                raise serializers.ValidationError("Each detail must include its 'offer_type'.")
+        return value
+
     # Update offer and its related details.
     def update(self, instance, validated_data):
         details_data = validated_data.pop('details', None)
@@ -152,25 +161,18 @@ class OfferSinglePatchSerializer(serializers.ModelSerializer):
             for detail_data in details_data:
                 detail_id = detail_data.get('id')
 
-                if detail_id:
-                    try:
-                        detail_obj = OfferDetail.objects.get(id=detail_id)
-                        if detail_obj.id not in existing_detail_ids:
-                            raise serializers.ValidationError(
-                                f"OfferDetail with id {detail_id} does not belong to this offer."
-                            )
+                if detail_id not in existing_detail_ids:
+                    raise serializers.ValidationError(
+                        f"OfferDetail with id {detail_id} does not belong to this offer.")
 
-                        for attr, value in detail_data.items():
-                            setattr(detail_obj, attr, value)
-                        detail_obj.save()
+                try:
+                    detail_obj = OfferDetail.objects.get(id=detail_id)
+                except OfferDetail.DoesNotExist:
+                    raise serializers.ValidationError(f"OfferDetail with id {detail_id} not found.")
 
-                    except OfferDetail.DoesNotExist:
-                        raise serializers.ValidationError(
-                            f"OfferDetail with id {detail_id} not found."
-                        )
-                else:
-                    detail_obj = OfferDetail.objects.create(**detail_data)
-                    instance.details.add(detail_obj)
+                for attr, value in detail_data.items():
+                    setattr(detail_obj, attr, value)
+                detail_obj.save()
 
         return instance
 
