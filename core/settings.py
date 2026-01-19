@@ -15,20 +15,9 @@ MEDIA_URL = '/uploads/'
 SECRET_KEY = os.getenv("SECRET_KEY", "insecure-dev-key")
 DEBUG = os.getenv("DEBUG", "False").upper() == "TRUE"
 
-ALLOWED_HOSTS = [
-    '127.0.0.1',
-    'localhost',
-    '35.216.177.61',
-    '34.76.57.149',
-    'enrico-kirschke.developerakademie.org',
-]
+ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", []).split(',')  
 
-CORS_ALLOWED_ORIGINS = [
-    'https://127.0.0.1',
-    'https://localhost',
-    'https://35.216.177.61',
-    'https://enrico-kirschke.developerakademie.org',
-]
+CORS_ALLOWED_ORIGINS = os.getenv("CORS_ALLOWED_ORIGINS", []).split(',')
 
 CORS_ALLOW_CREDENTIALS = True
 
