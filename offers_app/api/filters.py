@@ -15,7 +15,7 @@ def apply_offer_filters(queryset, params):
             raise ValueError("Invalid value for min_price. Must be a number.")
 
     max_delivery_time = params.get('max_delivery_time')
-    if max_delivery_time is not None:
+    if max_delivery_time is not None or max_delivery_time != "":
         try:
             max_delivery_time = int(max_delivery_time)  
             queryset = queryset.filter(details__delivery_time_in_days__lte=max_delivery_time)
