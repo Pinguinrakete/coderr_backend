@@ -4,6 +4,10 @@ django-filter==25.1
 djangorestframework==3.16.0
 django-cors-headers==4.7.0
 django-filter
+gunicorn==22.0.0
+python-dotenv==1.1.1
+psycopg2-binary==2.9.9
 Pillow>=10.0
 sqlparse==0.5.3
+whitenoise==6.5.0
 tzdata==2025.2

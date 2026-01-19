@@ -1,0 +1,55 @@
+services:
+  coderr_database:
+    image: postgres:16
+    container_name: coderr_database
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    restart: unless-stopped
+    networks:
+      - coderr_network
+
+  web:
+    image: coderr_backend:latest
+    build:
+      context: .
+      dockerfile: backend.Dockerfile
+    container_name: coderr_backend
+    command: ./backend.entrypoint.sh
+    env_file:
+      - .env
+    environment:
+      MEDIA_ROOT: /uploads
+      RUN_MIGRATIONS: "true"
+      STATIC_ROOT: /app/staticfiles
+      GUNICORN_WORKERS: 4  
+      GUNICORN_TIMEOUT: 20
+    volumes:
+      - uploads:/uploads
+      - staticfiles:/app/staticfiles
+    ports:
+      - "8000:8000"
+    depends_on:
+      - coderr_database
+    restart: unless-stopped
+    networks:
+      - coderr_network
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+volumes:
+  postgres_data:
+  staticfiles:
+  uploads:
+
+networks:
+  coderr_network:
+    driver: bridge

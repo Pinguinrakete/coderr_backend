@@ -1,0 +1,66 @@
+# =========================
+# Git & VCS
+# =========================
+.git
+.gitignore
+
+# =========================
+# Python / Django
+# =========================
+__pycache__/
+*.py[cod]
+*.pyo
+*.egg-info/
+*.mo
+*.log
+*.db
+db.sqlite3
+
+# Virtual environments
+.env
+.venv/
+venv/
+env/
+
+# Django generated files
+media/
+static/
+staticfiles/
+
+# =========================
+# Caches & tooling
+# =========================
+.cache/
+.pytest_cache/
+.mypy_cache/
+.coverage
+stats/
+
+# =========================
+# IDEs & OS
+# =========================
+.idea/
+.idea/workspace.xml
+.project
+.pydevproject
+.DS_Store
+
+# =========================
+# Build / distribution
+# =========================
+dist/
+build/
+docs/
+*.sql.gz
+
+# =========================
+# Logs
+# =========================
+logs/
+
+# =========================
+# Docker / Compose
+# =========================
+docker-compose.yml
+Dockerfile
+*.Dockerfile
