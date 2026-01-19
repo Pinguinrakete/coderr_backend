@@ -19,6 +19,7 @@ ALLOWED_HOSTS = [
     '127.0.0.1',
     'localhost',
     '35.216.177.61',
+    '34.76.57.149',
     'enrico-kirschke.developerakademie.org',
 ]
 
